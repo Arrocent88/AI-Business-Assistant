@@ -1,7 +1,33 @@
-print("=" * 50)
-print("      AI BUSINESS ASSISTANT")
-print("=" * 50)
+while True:
 
-print("¡Bienvenido Pablo!")
+    print("=" * 50)
+    print("      AI BUSINESS ASSISTANT")
+    print("=" * 50)
 
-print("Este es el inicio de tu primer proyecto profesional de IA.")
+    print("1. Clientes")
+    print("2. Ventas")
+    print("3. Inventario")
+    print("4. Salir")
+
+    opcion = input("Selecciona una opción: ")
+
+    print()
+
+    if opcion == "1":
+        print("Abriendo módulo de clientes...")
+
+    elif opcion == "2":
+        print("Abriendo módulo de ventas...")
+
+    elif opcion == "3":
+        print("Abriendo módulo de inventario...")
+
+    elif opcion == "4":
+        print("Hasta luego.")
+        break
+
+    else:
+        print("Opción incorrecta.")
+
+    input("\nPresiona ENTER para volver al menú...")
+    print()
