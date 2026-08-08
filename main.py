@@ -1,3 +1,5 @@
+from clientes import mostrar_clientes
+
 while True:
 
     print("=" * 50)
@@ -14,7 +16,7 @@ while True:
     print()
 
     if opcion == "1":
-        print("Abriendo módulo de clientes...")
+        mostrar_clientes()
 
     elif opcion == "2":
         print("Abriendo módulo de ventas...")
