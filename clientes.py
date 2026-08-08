@@ -1,4 +1,24 @@
-clientes = []
+import json
+from pathlib import Path
+
+ARCHIVO = Path("clientes.json")
+
+
+def cargar_clientes():
+    if ARCHIVO.exists():
+        with open(ARCHIVO, "r", encoding="utf-8") as archivo:
+            return json.load(archivo)
+
+    return []
+
+
+def guardar_clientes(clientes):
+    with open(ARCHIVO, "w", encoding="utf-8") as archivo:
+        json.dump(clientes, archivo, indent=4, ensure_ascii=False)
+
+
+clientes = cargar_clientes()
+
 
 def mostrar_clientes():
 
@@ -23,11 +43,15 @@ def mostrar_clientes():
             }
 
             clientes.append(cliente)
+            guardar_clientes(clientes)
 
             print("Cliente agregado correctamente.")
 
         elif opcion == "2":
             print("\nLista de clientes:")
+
+            if not clientes:
+                print("No hay clientes registrados.")
 
             for cliente in clientes:
                 print("-" * 30)
