@@ -1,4 +1,6 @@
 from clientes import mostrar_clientes
+from ventas import mostrar_ventas
+from inventario import mostrar_inventario
 
 while True:
 
@@ -19,10 +21,10 @@ while True:
         mostrar_clientes()
 
     elif opcion == "2":
-        print("Abriendo módulo de ventas...")
+        mostrar_ventas()
 
     elif opcion == "3":
-        print("Abriendo módulo de inventario...")
+        mostrar_inventario()
 
     elif opcion == "4":
         print("Hasta luego.")
