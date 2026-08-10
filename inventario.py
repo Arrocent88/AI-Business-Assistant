@@ -64,3 +64,18 @@ def mostrar_inventario():
 
         else:
             print("Opción incorrecta.")
+
+
+def descontar_inventario(nombre_producto, cantidad_vendida):
+             for item in inventario:
+              if item["producto"].lower() == nombre_producto.lower():
+               cantidad_actual = int(item["cantidad"])
+
+              if cantidad_actual < cantidad_vendida:
+                return False
+
+             item["cantidad"] = str(cantidad_actual - cantidad_vendida)
+             guardar_inventario(inventario)
+             return True
+
+             return False

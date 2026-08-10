@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from inventario import descontar_inventario
 
 ARCHIVO_VENTAS = Path("ventas.json")
 
@@ -33,19 +34,28 @@ def mostrar_ventas():
 
         if opcion == "1":
             cliente = input("Nombre del cliente: ")
-            producto = input("Producto o servicio: ")
+            producto = input("Producto: ")
+            cantidad = int(input("Cantidad vendida: "))
             monto = input("Monto de la venta: ")
 
-            venta = {
-                "cliente": cliente,
-                "producto": producto,
-                "monto": monto
-            }
+            if descontar_inventario(producto, cantidad):
 
-            ventas.append(venta)
-            guardar_ventas(ventas)
+                venta = {
+                    "cliente": cliente,
+                    "producto": producto,
+                    "cantidad": cantidad,
+                    "monto": monto
+                }
 
-            print("Venta registrada correctamente.")
+                ventas.append(venta)
+                guardar_ventas(ventas)
+
+                print("Venta registrada correctamente.")
+                print("Inventario actualizado correctamente.")
+
+            else:
+                print("No se pudo registrar la venta.")
+                print("Producto no encontrado o cantidad insuficiente.")
 
         elif opcion == "2":
             print("\nLista de ventas:")
@@ -57,6 +67,10 @@ def mostrar_ventas():
                 print("-" * 30)
                 print("Cliente:", venta["cliente"])
                 print("Producto:", venta["producto"])
+
+                if "cantidad" in venta:
+                    print("Cantidad:", venta["cantidad"])
+
                 print("Monto: $", venta["monto"])
 
         elif opcion == "3":

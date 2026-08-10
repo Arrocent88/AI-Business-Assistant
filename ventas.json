@@ -3,5 +3,11 @@
         "cliente": "Pedro Hernandez",
         "producto": "Reparacion",
         "monto": "$150"
+    },
+    {
+        "cliente": "Pedro Hernandez",
+        "producto": "Aceite 15W/40",
+        "cantidad": 2,
+        "monto": "50"
     }
 ]
