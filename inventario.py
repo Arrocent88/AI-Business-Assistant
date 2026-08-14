@@ -14,10 +14,49 @@ def cargar_inventario():
 
 def guardar_inventario(inventario):
     with open(ARCHIVO_INVENTARIO, "w", encoding="utf-8") as archivo:
-        json.dump(inventario, archivo, indent=4, ensure_ascii=False)
+        json.dump(
+            inventario,
+            archivo,
+            indent=4,
+            ensure_ascii=False
+        )
 
 
 inventario = cargar_inventario()
+
+
+def limpiar_precio(precio):
+    precio_limpio = str(precio).replace("$", "").strip()
+    return float(precio_limpio)
+
+
+def obtener_precio_producto(nombre_producto):
+    for item in inventario:
+        if item["producto"].lower() == nombre_producto.lower():
+            return limpiar_precio(item["precio"])
+
+    return None
+
+
+def descontar_inventario(nombre_producto, cantidad_vendida):
+    for item in inventario:
+
+        if item["producto"].lower() == nombre_producto.lower():
+
+            cantidad_actual = int(item["cantidad"])
+
+            if cantidad_actual < cantidad_vendida:
+                return False
+
+            item["cantidad"] = str(
+                cantidad_actual - cantidad_vendida
+            )
+
+            guardar_inventario(inventario)
+
+            return True
+
+    return False
 
 
 def mostrar_inventario():
@@ -32,9 +71,10 @@ def mostrar_inventario():
         opcion = input("Selecciona una opción: ")
 
         if opcion == "1":
+
             producto = input("Nombre del producto: ")
             cantidad = input("Cantidad: ")
-            precio = input("Precio: ")
+            precio = input("Precio: $")
 
             item = {
                 "producto": producto,
@@ -48,34 +88,23 @@ def mostrar_inventario():
             print("Producto agregado correctamente.")
 
         elif opcion == "2":
+
             print("\nInventario:")
 
             if not inventario:
                 print("No hay productos registrados.")
 
             for item in inventario:
+
                 print("-" * 30)
                 print("Producto:", item["producto"])
                 print("Cantidad:", item["cantidad"])
-                print("Precio: $", item["precio"])
+
+                precio = limpiar_precio(item["precio"])
+                print(f"Precio: ${precio:.2f}")
 
         elif opcion == "3":
             break
 
         else:
             print("Opción incorrecta.")
-
-
-def descontar_inventario(nombre_producto, cantidad_vendida):
-             for item in inventario:
-              if item["producto"].lower() == nombre_producto.lower():
-               cantidad_actual = int(item["cantidad"])
-
-              if cantidad_actual < cantidad_vendida:
-                return False
-
-             item["cantidad"] = str(cantidad_actual - cantidad_vendida)
-             guardar_inventario(inventario)
-             return True
-
-             return False

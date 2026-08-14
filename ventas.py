@@ -1,6 +1,7 @@
+
 import json
 from pathlib import Path
-from inventario import descontar_inventario
+from inventario import obtener_precio_producto, descontar_inventario
 
 ARCHIVO_VENTAS = Path("ventas.json")
 
@@ -15,7 +16,12 @@ def cargar_ventas():
 
 def guardar_ventas(ventas):
     with open(ARCHIVO_VENTAS, "w", encoding="utf-8") as archivo:
-        json.dump(ventas, archivo, indent=4, ensure_ascii=False)
+        json.dump(
+            ventas,
+            archivo,
+            indent=4,
+            ensure_ascii=False
+        )
 
 
 ventas = cargar_ventas()
@@ -33,10 +39,16 @@ def mostrar_ventas():
         opcion = input("Selecciona una opción: ")
 
         if opcion == "1":
+
             cliente = input("Nombre del cliente: ")
             producto = input("Producto: ")
             cantidad = int(input("Cantidad vendida: "))
-            precio_unitario = float(input("Precio unitario: $"))
+
+            precio_unitario = obtener_precio_producto(producto)
+
+            if precio_unitario is None:
+                print("Producto no encontrado en inventario.")
+                continue
 
             monto = cantidad * precio_unitario
 
@@ -55,19 +67,22 @@ def mostrar_ventas():
 
                 print("Venta registrada correctamente.")
                 print("Inventario actualizado correctamente.")
+                print(f"Precio unitario: ${precio_unitario:.2f}")
                 print(f"Total de la venta: ${monto:.2f}")
 
             else:
                 print("No se pudo registrar la venta.")
-                print("Producto inexistente o inventario insuficiente.")
+                print("Inventario insuficiente.")
 
         elif opcion == "2":
+
             print("\nLista de ventas:")
 
             if not ventas:
                 print("No hay ventas registradas.")
 
             for venta in ventas:
+
                 print("-" * 30)
                 print("Cliente:", venta["cliente"])
                 print("Producto:", venta["producto"])

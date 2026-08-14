@@ -16,5 +16,12 @@
         "cantidad": 2,
         "precio_unitario": 25.0,
         "monto": 50.0
+    },
+    {
+        "cliente": "Pedro Hernandez",
+        "producto": "Aceite 15W/40",
+        "cantidad": 1,
+        "precio_unitario": 25.0,
+        "monto": 25.0
     }
 ]
