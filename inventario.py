@@ -38,6 +38,22 @@ def obtener_precio_producto(nombre_producto):
     return None
 
 
+def obtener_productos_disponibles():
+    productos = []
+
+    for item in inventario:
+        cantidad = int(item["cantidad"])
+
+        if cantidad > 0:
+            productos.append({
+                "producto": item["producto"],
+                "cantidad": cantidad,
+                "precio": limpiar_precio(item["precio"])
+            })
+
+    return productos
+
+
 def descontar_inventario(nombre_producto, cantidad_vendida):
     for item in inventario:
 
