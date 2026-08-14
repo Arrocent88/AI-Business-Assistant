@@ -36,7 +36,9 @@ def mostrar_ventas():
             cliente = input("Nombre del cliente: ")
             producto = input("Producto: ")
             cantidad = int(input("Cantidad vendida: "))
-            monto = input("Monto de la venta: ")
+            precio_unitario = float(input("Precio unitario: $"))
+
+            monto = cantidad * precio_unitario
 
             if descontar_inventario(producto, cantidad):
 
@@ -44,6 +46,7 @@ def mostrar_ventas():
                     "cliente": cliente,
                     "producto": producto,
                     "cantidad": cantidad,
+                    "precio_unitario": precio_unitario,
                     "monto": monto
                 }
 
@@ -52,10 +55,11 @@ def mostrar_ventas():
 
                 print("Venta registrada correctamente.")
                 print("Inventario actualizado correctamente.")
+                print(f"Total de la venta: ${monto:.2f}")
 
             else:
                 print("No se pudo registrar la venta.")
-                print("Producto no encontrado o cantidad insuficiente.")
+                print("Producto inexistente o inventario insuficiente.")
 
         elif opcion == "2":
             print("\nLista de ventas:")
@@ -70,6 +74,12 @@ def mostrar_ventas():
 
                 if "cantidad" in venta:
                     print("Cantidad:", venta["cantidad"])
+
+                if "precio_unitario" in venta:
+                    print(
+                        "Precio unitario: $",
+                        venta["precio_unitario"]
+                    )
 
                 print("Monto: $", venta["monto"])
 
