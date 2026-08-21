@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from clientes import obtener_clientes_disponibles
 from inventario import (
     descontar_inventario,
     obtener_productos_disponibles
@@ -43,7 +44,35 @@ def mostrar_ventas():
 
         if opcion == "1":
 
-            cliente = input("Nombre del cliente: ")
+            clientes = obtener_clientes_disponibles()
+
+            if not clientes:
+                print("No hay clientes registrados.")
+                continue
+
+            print("\n===== CLIENTES DISPONIBLES =====")
+
+            for numero, cliente in enumerate(clientes, start=1):
+                print(f"{numero}. {cliente['nombre']}")
+
+            try:
+                seleccion_cliente = int(
+                    input("\nSelecciona el número del cliente: ")
+                )
+
+                if (
+                    seleccion_cliente < 1
+                    or seleccion_cliente > len(clientes)
+                ):
+                    print("Cliente seleccionado incorrecto.")
+                    continue
+
+                cliente_seleccionado = clientes[seleccion_cliente - 1]
+                cliente = cliente_seleccionado["nombre"]
+
+            except ValueError:
+                print("Debes ingresar un número válido.")
+                continue
 
             productos = obtener_productos_disponibles()
 
@@ -61,15 +90,20 @@ def mostrar_ventas():
                 )
 
             try:
-                seleccion = int(
+                seleccion_producto = int(
                     input("\nSelecciona el número del producto: ")
                 )
 
-                if seleccion < 1 or seleccion > len(productos):
+                if (
+                    seleccion_producto < 1
+                    or seleccion_producto > len(productos)
+                ):
                     print("Producto seleccionado incorrecto.")
                     continue
 
-                producto_seleccionado = productos[seleccion - 1]
+                producto_seleccionado = productos[
+                    seleccion_producto - 1
+                ]
 
                 producto = producto_seleccionado["producto"]
                 precio_unitario = producto_seleccionado["precio"]
@@ -103,7 +137,10 @@ def mostrar_ventas():
 
                 print("\nVenta registrada correctamente.")
                 print("Inventario actualizado correctamente.")
+                print(f"Cliente: {cliente}")
+                print(f"Producto: {producto}")
                 print(f"Precio unitario: ${precio_unitario:.2f}")
+                print(f"Cantidad: {cantidad}")
                 print(f"Total de la venta: ${monto:.2f}")
 
             else:

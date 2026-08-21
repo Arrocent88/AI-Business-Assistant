@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+
 ARCHIVO = Path("clientes.json")
 
 
@@ -14,10 +15,19 @@ def cargar_clientes():
 
 def guardar_clientes(clientes):
     with open(ARCHIVO, "w", encoding="utf-8") as archivo:
-        json.dump(clientes, archivo, indent=4, ensure_ascii=False)
+        json.dump(
+            clientes,
+            archivo,
+            indent=4,
+            ensure_ascii=False
+        )
 
 
 clientes = cargar_clientes()
+
+
+def obtener_clientes_disponibles():
+    return clientes
 
 
 def mostrar_clientes():
@@ -32,9 +42,14 @@ def mostrar_clientes():
         opcion = input("Selecciona una opción: ")
 
         if opcion == "1":
-            nombre = input("Nombre del cliente: ")
-            telefono = input("Teléfono: ")
-            correo = input("Correo: ")
+
+            nombre = input("Nombre: ").strip()
+            telefono = input("Teléfono: ").strip()
+            correo = input("Correo: ").strip()
+
+            if not nombre:
+                print("El nombre del cliente es obligatorio.")
+                continue
 
             cliente = {
                 "nombre": nombre,
@@ -48,14 +63,16 @@ def mostrar_clientes():
             print("Cliente agregado correctamente.")
 
         elif opcion == "2":
-            print("\nLista de clientes:")
+
+            print("\n===== LISTA DE CLIENTES =====")
 
             if not clientes:
                 print("No hay clientes registrados.")
+                continue
 
-            for cliente in clientes:
+            for numero, cliente in enumerate(clientes, start=1):
                 print("-" * 30)
-                print("Nombre:", cliente["nombre"])
+                print(f"{numero}. {cliente['nombre']}")
                 print("Teléfono:", cliente["telefono"])
                 print("Correo:", cliente["correo"])
 
