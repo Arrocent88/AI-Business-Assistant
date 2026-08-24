@@ -4,7 +4,12 @@ from inventario import mostrar_inventario, inventario
 
 
 def convertir_numero(valor):
-    return float(str(valor).replace("$", "").strip())
+    return float(
+        str(valor)
+        .replace("$", "")
+        .replace(",", "")
+        .strip()
+    )
 
 
 def mostrar_resumen():
@@ -46,7 +51,9 @@ def mostrar_reporte_clientes():
         total_comprado = 0
 
         for venta in ventas_cliente:
-            total_comprado += convertir_numero(venta["monto"])
+            total_comprado += convertir_numero(
+                venta["monto"]
+            )
 
         print("-" * 30)
         print("Cliente:", nombre)
@@ -90,7 +97,10 @@ def mostrar_productos_mas_vendidos():
         print("-" * 30)
         print(f"{posicion}. {producto}")
         print("Unidades vendidas:", datos["cantidad"])
-        print(f"Ingresos generados: ${datos['ingresos']:.2f}")
+        print(
+            f"Ingresos generados: "
+            f"${datos['ingresos']:.2f}"
+        )
 
 
 def mostrar_alerta_inventario():
@@ -125,6 +135,73 @@ def mostrar_alerta_inventario():
             print("Estado: STOCK BAJO")
 
 
+def mostrar_reporte_financiero():
+    print("\n===== REPORTE FINANCIERO =====")
+
+    if not ventas:
+        print("No hay ventas registradas.")
+        return
+
+    ingresos_totales = 0
+    ingresos_con_costo = 0
+    costos_totales = 0
+    ganancia_conocida = 0
+    ventas_con_costo = 0
+    ventas_sin_costo = 0
+
+    for venta in ventas:
+        monto = convertir_numero(venta["monto"])
+        ingresos_totales += monto
+
+        if (
+            "costo_total" in venta
+            and "ganancia" in venta
+        ):
+            costo_total = convertir_numero(
+                venta["costo_total"]
+            )
+
+            ganancia = convertir_numero(
+                venta["ganancia"]
+            )
+
+            ingresos_con_costo += monto
+            costos_totales += costo_total
+            ganancia_conocida += ganancia
+            ventas_con_costo += 1
+
+        else:
+            ventas_sin_costo += 1
+
+    print(f"Ingresos totales: ${ingresos_totales:.2f}")
+    print(f"Costos registrados: ${costos_totales:.2f}")
+    print(
+        f"Ganancia neta conocida: "
+        f"${ganancia_conocida:.2f}"
+    )
+    print()
+    print("Ventas con costo registrado:", ventas_con_costo)
+    print("Ventas históricas sin costo:", ventas_sin_costo)
+
+    if ventas_sin_costo > 0:
+        print()
+        print(
+            "Nota: La ganancia neta no incluye las "
+            "ventas antiguas que no tienen costo registrado."
+        )
+
+    if ingresos_con_costo > 0:
+        margen = (
+            ganancia_conocida
+            / ingresos_con_costo
+        ) * 100
+
+        print(
+            f"Margen sobre ventas con costo: "
+            f"{margen:.2f}%"
+        )
+
+
 while True:
     print("=" * 50)
     print("       AI BUSINESS ASSISTANT")
@@ -137,7 +214,8 @@ while True:
     print("5. Reporte por cliente")
     print("6. Productos más vendidos")
     print("7. Alerta de inventario")
-    print("8. Salir")
+    print("8. Reporte financiero")
+    print("9. Salir")
 
     opcion = input("Selecciona una opción: ")
 
@@ -165,6 +243,9 @@ while True:
         mostrar_alerta_inventario()
 
     elif opcion == "8":
+        mostrar_reporte_financiero()
+
+    elif opcion == "9":
         print("Hasta luego.")
         break
 
