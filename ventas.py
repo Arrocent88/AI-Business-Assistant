@@ -28,6 +28,15 @@ def guardar_ventas(ventas):
         )
 
 
+def limpiar_numero(valor):
+    return float(
+        str(valor)
+        .replace("$", "")
+        .replace(",", "")
+        .strip()
+    )
+
+
 ventas = cargar_ventas()
 
 
@@ -67,7 +76,10 @@ def mostrar_ventas():
                     print("Cliente seleccionado incorrecto.")
                     continue
 
-                cliente_seleccionado = clientes[seleccion_cliente - 1]
+                cliente_seleccionado = clientes[
+                    seleccion_cliente - 1
+                ]
+
                 cliente = cliente_seleccionado["nombre"]
 
             except ValueError:
@@ -83,11 +95,17 @@ def mostrar_ventas():
             print("\n===== PRODUCTOS DISPONIBLES =====")
 
             for numero, item in enumerate(productos, start=1):
-                print(
+
+                texto = (
                     f"{numero}. {item['producto']} | "
                     f"Stock: {item['cantidad']} | "
                     f"Precio: ${item['precio']:.2f}"
                 )
+
+                if item.get("costo") is not None:
+                    texto += f" | Costo: ${item['costo']:.2f}"
+
+                print(texto)
 
             try:
                 seleccion_producto = int(
@@ -107,6 +125,7 @@ def mostrar_ventas():
 
                 producto = producto_seleccionado["producto"]
                 precio_unitario = producto_seleccionado["precio"]
+                costo_unitario = producto_seleccionado.get("costo")
 
                 cantidad = int(
                     input("Cantidad vendida: ")
@@ -122,6 +141,13 @@ def mostrar_ventas():
 
             monto = cantidad * precio_unitario
 
+            costo_total = None
+            ganancia = None
+
+            if costo_unitario is not None:
+                costo_total = cantidad * costo_unitario
+                ganancia = monto - costo_total
+
             if descontar_inventario(producto, cantidad):
 
                 venta = {
@@ -131,6 +157,11 @@ def mostrar_ventas():
                     "precio_unitario": precio_unitario,
                     "monto": monto
                 }
+
+                if costo_unitario is not None:
+                    venta["costo_unitario"] = costo_unitario
+                    venta["costo_total"] = costo_total
+                    venta["ganancia"] = ganancia
 
                 ventas.append(venta)
                 guardar_ventas(ventas)
@@ -142,6 +173,16 @@ def mostrar_ventas():
                 print(f"Precio unitario: ${precio_unitario:.2f}")
                 print(f"Cantidad: {cantidad}")
                 print(f"Total de la venta: ${monto:.2f}")
+
+                if costo_unitario is not None:
+                    print(f"Costo unitario: ${costo_unitario:.2f}")
+                    print(f"Costo total: ${costo_total:.2f}")
+                    print(f"Ganancia de la venta: ${ganancia:.2f}")
+                else:
+                    print(
+                        "Ganancia: NO DISPONIBLE "
+                        "(producto sin costo registrado)"
+                    )
 
             else:
                 print("\nNo se pudo registrar la venta.")
@@ -165,17 +206,40 @@ def mostrar_ventas():
                     print("Cantidad:", venta["cantidad"])
 
                 if "precio_unitario" in venta:
+                    precio = limpiar_numero(
+                        venta["precio_unitario"]
+                    )
+                    print(f"Precio unitario: ${precio:.2f}")
+
+                monto = limpiar_numero(venta["monto"])
+                print(f"Monto: ${monto:.2f}")
+
+                if "costo_unitario" in venta:
+                    costo_unitario = limpiar_numero(
+                        venta["costo_unitario"]
+                    )
                     print(
-                        f"Precio unitario: "
-                        f"${float(venta['precio_unitario']):.2f}"
+                        f"Costo unitario: "
+                        f"${costo_unitario:.2f}"
                     )
 
-                monto = str(venta["monto"]).replace("$", "").strip()
+                if "costo_total" in venta:
+                    costo_total = limpiar_numero(
+                        venta["costo_total"]
+                    )
+                    print(
+                        f"Costo total: "
+                        f"${costo_total:.2f}"
+                    )
 
-                try:
-                    print(f"Monto: ${float(monto):.2f}")
-                except ValueError:
-                    print("Monto:", venta["monto"])
+                if "ganancia" in venta:
+                    ganancia = limpiar_numero(
+                        venta["ganancia"]
+                    )
+                    print(
+                        f"Ganancia: "
+                        f"${ganancia:.2f}"
+                    )
 
         elif opcion == "3":
             break
