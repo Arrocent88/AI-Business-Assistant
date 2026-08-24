@@ -93,6 +93,38 @@ def mostrar_productos_mas_vendidos():
         print(f"Ingresos generados: ${datos['ingresos']:.2f}")
 
 
+def mostrar_alerta_inventario():
+    print("\n===== ALERTA DE INVENTARIO =====")
+
+    limite_bajo = 5
+    productos_bajos = []
+
+    for item in inventario:
+        cantidad = int(item["cantidad"])
+
+        if cantidad <= limite_bajo:
+            productos_bajos.append(item)
+
+    if not productos_bajos:
+        print("Inventario en buen nivel.")
+        return
+
+    print("Productos que necesitan reposición:")
+
+    for item in productos_bajos:
+        cantidad = int(item["cantidad"])
+        producto = item["producto"]
+
+        print("-" * 30)
+        print("Producto:", producto)
+        print("Stock actual:", cantidad)
+
+        if cantidad == 0:
+            print("Estado: AGOTADO")
+        else:
+            print("Estado: STOCK BAJO")
+
+
 while True:
     print("=" * 50)
     print("       AI BUSINESS ASSISTANT")
@@ -104,7 +136,8 @@ while True:
     print("4. Resumen del negocio")
     print("5. Reporte por cliente")
     print("6. Productos más vendidos")
-    print("7. Salir")
+    print("7. Alerta de inventario")
+    print("8. Salir")
 
     opcion = input("Selecciona una opción: ")
 
@@ -129,6 +162,9 @@ while True:
         mostrar_productos_mas_vendidos()
 
     elif opcion == "7":
+        mostrar_alerta_inventario()
+
+    elif opcion == "8":
         print("Hasta luego.")
         break
 
