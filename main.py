@@ -8,10 +8,12 @@ def mostrar_resumen():
     total_productos = len(inventario)
 
     unidades_disponibles = 0
+
     for item in inventario:
         unidades_disponibles += int(item["cantidad"])
 
     ingresos_totales = 0
+
     for venta in ventas:
         monto = str(venta["monto"]).replace("$", "").strip()
         ingresos_totales += float(monto)
@@ -24,6 +26,36 @@ def mostrar_resumen():
     print(f"Ingresos totales: ${ingresos_totales:.2f}")
 
 
+def mostrar_reporte_clientes():
+
+    print("\n===== REPORTE POR CLIENTE =====")
+
+    if not clientes:
+        print("No hay clientes registrados.")
+        return
+
+    for cliente in clientes:
+
+        nombre = cliente["nombre"]
+
+        ventas_cliente = [
+            venta
+            for venta in ventas
+            if venta["cliente"].lower() == nombre.lower()
+        ]
+
+        total_comprado = 0
+
+        for venta in ventas_cliente:
+            monto = str(venta["monto"]).replace("$", "").strip()
+            total_comprado += float(monto)
+
+        print("-" * 30)
+        print("Cliente:", nombre)
+        print("Ventas realizadas:", len(ventas_cliente))
+        print(f"Total comprado: ${total_comprado:.2f}")
+
+
 while True:
 
     print("=" * 50)
@@ -34,7 +66,8 @@ while True:
     print("2. Ventas")
     print("3. Inventario")
     print("4. Resumen del negocio")
-    print("5. Salir")
+    print("5. Reporte por cliente")
+    print("6. Salir")
 
     opcion = input("Selecciona una opción: ")
 
@@ -53,6 +86,9 @@ while True:
         mostrar_resumen()
 
     elif opcion == "5":
+        mostrar_reporte_clientes()
+
+    elif opcion == "6":
         print("Hasta luego.")
         break
 
