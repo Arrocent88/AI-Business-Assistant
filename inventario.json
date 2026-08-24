@@ -2,6 +2,7 @@
     {
         "producto": "Aceite 15W/40",
         "cantidad": "3",
-        "precio": "$25"
+        "precio": "$25",
+        "costo": 15.0
     }
 ]
