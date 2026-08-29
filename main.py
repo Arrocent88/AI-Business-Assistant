@@ -258,6 +258,72 @@ def mostrar_ganancia_por_producto():
         print(f"Margen: {margen:.2f}%")
 
 
+def mostrar_plan_reposicion():
+    print("\n===== PLAN DE REPOSICIÓN =====")
+
+    limite_bajo = 5
+    stock_objetivo = 10
+
+    productos_reponer = []
+    inversion_total = 0
+
+    for item in inventario:
+        cantidad_actual = int(item["cantidad"])
+
+        if cantidad_actual <= limite_bajo:
+
+            if "costo" not in item:
+                productos_reponer.append({
+                    "producto": item["producto"],
+                    "cantidad_actual": cantidad_actual,
+                    "faltantes": stock_objetivo - cantidad_actual,
+                    "costo": None,
+                    "inversion": None
+                })
+                continue
+
+            costo = convertir_numero(item["costo"])
+            faltantes = stock_objetivo - cantidad_actual
+            inversion = faltantes * costo
+
+            inversion_total += inversion
+
+            productos_reponer.append({
+                "producto": item["producto"],
+                "cantidad_actual": cantidad_actual,
+                "faltantes": faltantes,
+                "costo": costo,
+                "inversion": inversion
+            })
+
+    if not productos_reponer:
+        print("No hay productos que necesiten reposición.")
+        return
+
+    for item in productos_reponer:
+        print("-" * 30)
+        print("Producto:", item["producto"])
+        print("Stock actual:", item["cantidad_actual"])
+        print("Stock objetivo:", stock_objetivo)
+        print("Unidades a comprar:", item["faltantes"])
+
+        if item["costo"] is None:
+            print("Costo unitario: NO REGISTRADO")
+            print("Inversión necesaria: NO DISPONIBLE")
+        else:
+            print(f"Costo unitario: ${item['costo']:.2f}")
+            print(
+                f"Inversión necesaria: "
+                f"${item['inversion']:.2f}"
+            )
+
+    print("-" * 30)
+    print(
+        f"Inversión total conocida para reposición: "
+        f"${inversion_total:.2f}"
+    )
+
+
 while True:
     print("=" * 50)
     print("       AI BUSINESS ASSISTANT")
@@ -272,7 +338,8 @@ while True:
     print("7. Alerta de inventario")
     print("8. Reporte financiero")
     print("9. Ganancia por producto")
-    print("10. Salir")
+    print("10. Plan de reposición")
+    print("11. Salir")
 
     opcion = input("Selecciona una opción: ")
 
@@ -306,6 +373,9 @@ while True:
         mostrar_ganancia_por_producto()
 
     elif opcion == "10":
+        mostrar_plan_reposicion()
+
+    elif opcion == "11":
         print("Hasta luego.")
         break
 
