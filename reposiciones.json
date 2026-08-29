@@ -1,0 +1,11 @@
+[
+    {
+        "producto": "Aceite 15W/40",
+        "cantidad_comprada": 8,
+        "costo_unitario": 15.0,
+        "inversion": 120.0,
+        "stock_anterior": 2,
+        "stock_nuevo": 10,
+        "costo_promedio_nuevo": 15.0
+    }
+]
