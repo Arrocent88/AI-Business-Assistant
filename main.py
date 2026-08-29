@@ -133,13 +133,8 @@ def mostrar_productos_mas_vendidos():
                 "ingresos": 0
             }
 
-        reporte[producto][
-            "cantidad"
-        ] += cantidad
-
-        reporte[producto][
-            "ingresos"
-        ] += monto
+        reporte[producto]["cantidad"] += cantidad
+        reporte[producto]["ingresos"] += monto
 
     productos_ordenados = sorted(
         reporte.items(),
@@ -155,9 +150,7 @@ def mostrar_productos_mas_vendidos():
         start=1
     ):
         print("-" * 30)
-        print(
-            f"{posicion}. {producto}"
-        )
+        print(f"{posicion}. {producto}")
         print(
             "Unidades vendidas:",
             datos["cantidad"]
@@ -178,8 +171,7 @@ def mostrar_alerta_inventario():
     productos_bajos = [
         item
         for item in inventario
-        if int(item["cantidad"])
-        <= limite_bajo
+        if int(item["cantidad"]) <= limite_bajo
     ]
 
     if not productos_bajos:
@@ -254,9 +246,7 @@ def mostrar_reporte_financiero():
         else:
             ventas_sin_costo += 1
 
-    gastos_totales = (
-        total_gastos_operativos()
-    )
+    gastos_totales = total_gastos_operativos()
 
     resultado_operativo = (
         ganancia_conocida
@@ -354,17 +344,9 @@ def mostrar_ganancia_por_producto():
                 "ganancia": 0
             }
 
-        reporte[producto][
-            "cantidad"
-        ] += cantidad
-
-        reporte[producto][
-            "ingresos"
-        ] += ingreso
-
-        reporte[producto][
-            "ganancia"
-        ] += ganancia
+        reporte[producto]["cantidad"] += cantidad
+        reporte[producto]["ingresos"] += ingreso
+        reporte[producto]["ganancia"] += ganancia
 
     if not reporte:
         print(
@@ -440,16 +422,11 @@ def mostrar_plan_reposicion():
 
             if "costo" not in item:
                 productos_reponer.append({
-                    "producto":
-                        item["producto"],
-                    "cantidad_actual":
-                        cantidad_actual,
-                    "faltantes":
-                        faltantes,
-                    "costo":
-                        None,
-                    "inversion":
-                        None
+                    "producto": item["producto"],
+                    "cantidad_actual": cantidad_actual,
+                    "faltantes": faltantes,
+                    "costo": None,
+                    "inversion": None
                 })
 
                 continue
@@ -465,16 +442,11 @@ def mostrar_plan_reposicion():
             inversion_total += inversion
 
             productos_reponer.append({
-                "producto":
-                    item["producto"],
-                "cantidad_actual":
-                    cantidad_actual,
-                "faltantes":
-                    faltantes,
-                "costo":
-                    costo,
-                "inversion":
-                    inversion
+                "producto": item["producto"],
+                "cantidad_actual": cantidad_actual,
+                "faltantes": faltantes,
+                "costo": costo,
+                "inversion": inversion
             })
 
     if not productos_reponer:
@@ -667,9 +639,7 @@ def mostrar_resumen_ejecutivo():
         if "costo_total" in venta
     )
 
-    gastos_totales = (
-        total_gastos_operativos()
-    )
+    gastos_totales = total_gastos_operativos()
 
     resultado_operativo = (
         ganancia_conocida
@@ -789,9 +759,7 @@ def mostrar_flujo_caja():
         if "inversion" in reposicion
     )
 
-    salidas_gastos = (
-        total_gastos_operativos()
-    )
+    salidas_gastos = total_gastos_operativos()
 
     salidas_totales = (
         salidas_reposicion
@@ -842,6 +810,222 @@ def mostrar_flujo_caja():
         )
 
 
+def mostrar_diagnostico_negocio():
+    print(
+        "\n===== DIAGNÓSTICO DEL NEGOCIO ====="
+    )
+
+    entradas_ventas = sum(
+        convertir_numero(
+            venta["monto"]
+        )
+        for venta in ventas
+    )
+
+    salidas_reposicion = sum(
+        convertir_numero(
+            reposicion["inversion"]
+        )
+        for reposicion in reposiciones
+        if "inversion" in reposicion
+    )
+
+    gastos_totales = total_gastos_operativos()
+
+    flujo_neto = (
+        entradas_ventas
+        - salidas_reposicion
+        - gastos_totales
+    )
+
+    capital_inventario = 0
+    valor_venta_inventario = 0
+    productos_stock_bajo = 0
+    productos_sin_costo = 0
+
+    for item in inventario:
+        cantidad = int(
+            item["cantidad"]
+        )
+
+        precio = convertir_numero(
+            item["precio"]
+        )
+
+        valor_venta_inventario += (
+            cantidad * precio
+        )
+
+        if cantidad <= 5:
+            productos_stock_bajo += 1
+
+        if "costo" in item:
+            costo = convertir_numero(
+                item["costo"]
+            )
+
+            capital_inventario += (
+                cantidad * costo
+            )
+
+        else:
+            productos_sin_costo += 1
+
+    ganancia_potencial = (
+        valor_venta_inventario
+        - capital_inventario
+    )
+
+    print(
+        f"Ventas registradas: "
+        f"{len(ventas)}"
+    )
+
+    print(
+        f"Entradas por ventas: "
+        f"${entradas_ventas:.2f}"
+    )
+
+    print(
+        f"Gastos operativos: "
+        f"${gastos_totales:.2f}"
+    )
+
+    print(
+        f"Flujo disponible registrado: "
+        f"${flujo_neto:.2f}"
+    )
+
+    print()
+
+    print(
+        f"Capital actual en inventario: "
+        f"${capital_inventario:.2f}"
+    )
+
+    print(
+        f"Valor potencial del inventario: "
+        f"${valor_venta_inventario:.2f}"
+    )
+
+    print(
+        f"Ganancia potencial del inventario: "
+        f"${ganancia_potencial:.2f}"
+    )
+
+    print("\n===== DIAGNÓSTICO =====")
+
+    if flujo_neto > 0:
+        print(
+            "✓ El flujo de caja registrado "
+            "es positivo."
+        )
+
+    elif flujo_neto < 0:
+        print(
+            "⚠ El flujo de caja registrado "
+            "es negativo."
+        )
+
+    else:
+        print(
+            "⚠ El flujo de caja está "
+            "equilibrado."
+        )
+
+    if ganancia_potencial > 0:
+        print(
+            "✓ El inventario tiene "
+            "ganancia potencial."
+        )
+
+    elif ganancia_potencial < 0:
+        print(
+            "⚠ El valor de venta del inventario "
+            "es menor que su costo conocido."
+        )
+
+    else:
+        print(
+            "⚠ No hay ganancia potencial "
+            "registrada en inventario."
+        )
+
+    if productos_stock_bajo == 0:
+        print(
+            "✓ El inventario está en "
+            "un nivel adecuado."
+        )
+    else:
+        print(
+            f"⚠ Hay {productos_stock_bajo} "
+            "producto(s) con stock bajo."
+        )
+
+    if productos_sin_costo > 0:
+        print(
+            f"⚠ Hay {productos_sin_costo} "
+            "producto(s) sin costo registrado."
+        )
+
+    if entradas_ventas > 0:
+        porcentaje_gastos = (
+            gastos_totales
+            / entradas_ventas
+        ) * 100
+
+        print(
+            f"Los gastos operativos representan "
+            f"{porcentaje_gastos:.2f}% "
+            f"de las ventas registradas."
+        )
+
+    print("\n===== RECOMENDACIÓN =====")
+
+    if flujo_neto < 0:
+        print(
+            "Prioridad: reducir salidas de efectivo "
+            "o aumentar ventas."
+        )
+
+    elif productos_stock_bajo > 0:
+        print(
+            "El negocio tiene flujo positivo, "
+            "pero debe revisar los productos "
+            "con stock bajo antes de perder ventas."
+        )
+
+    elif ganancia_potencial > 0:
+        print(
+            "El negocio mantiene flujo positivo "
+            "y el inventario tiene potencial "
+            "de ganancia. Continúa controlando "
+            "gastos, ventas y reposiciones."
+        )
+
+    else:
+        print(
+            "Continúa registrando ventas, costos "
+            "y gastos para obtener un diagnóstico "
+            "más completo."
+        )
+
+    ventas_sin_costo = sum(
+        1
+        for venta in ventas
+        if "costo_total" not in venta
+    )
+
+    if ventas_sin_costo > 0:
+        print()
+        print(
+            f"IMPORTANTE: Hay {ventas_sin_costo} "
+            "venta(s) histórica(s) sin costo "
+            "registrado. El diagnóstico financiero "
+            "todavía es parcial."
+        )
+
+
 while True:
     print("=" * 50)
     print("       AI BUSINESS ASSISTANT")
@@ -861,7 +1045,8 @@ while True:
     print("12. Valor del inventario")
     print("13. Resumen ejecutivo")
     print("14. Flujo de caja")
-    print("15. Salir")
+    print("15. Diagnóstico del negocio")
+    print("16. Salir")
 
     opcion = input(
         "Selecciona una opción: "
@@ -912,6 +1097,9 @@ while True:
         mostrar_flujo_caja()
 
     elif opcion == "15":
+        mostrar_diagnostico_negocio()
+
+    elif opcion == "16":
         print("Hasta luego.")
         break
 
@@ -921,4 +1109,5 @@ while True:
     input(
         "\nPresiona ENTER para volver al menú..."
     )
+
     print()
