@@ -97,10 +97,7 @@ def mostrar_productos_mas_vendidos():
         print("-" * 30)
         print(f"{posicion}. {producto}")
         print("Unidades vendidas:", datos["cantidad"])
-        print(
-            f"Ingresos generados: "
-            f"${datos['ingresos']:.2f}"
-        )
+        print(f"Ingresos generados: ${datos['ingresos']:.2f}")
 
 
 def mostrar_alerta_inventario():
@@ -153,10 +150,7 @@ def mostrar_reporte_financiero():
         monto = convertir_numero(venta["monto"])
         ingresos_totales += monto
 
-        if (
-            "costo_total" in venta
-            and "ganancia" in venta
-        ):
+        if "costo_total" in venta and "ganancia" in venta:
             costo_total = convertir_numero(
                 venta["costo_total"]
             )
@@ -175,11 +169,7 @@ def mostrar_reporte_financiero():
 
     print(f"Ingresos totales: ${ingresos_totales:.2f}")
     print(f"Costos registrados: ${costos_totales:.2f}")
-    print(
-        f"Ganancia neta conocida: "
-        f"${ganancia_conocida:.2f}"
-    )
-
+    print(f"Ganancia neta conocida: ${ganancia_conocida:.2f}")
     print()
     print("Ventas con costo registrado:", ventas_con_costo)
     print("Ventas históricas sin costo:", ventas_sin_costo)
@@ -197,10 +187,7 @@ def mostrar_reporte_financiero():
             / ingresos_con_costo
         ) * 100
 
-        print(
-            f"Margen sobre ventas con costo: "
-            f"{margen:.2f}%"
-        )
+        print(f"Margen sobre ventas con costo: {margen:.2f}%")
 
 
 def mostrar_ganancia_por_producto():
@@ -392,16 +379,93 @@ def mostrar_valor_inventario():
                 / valor_venta_total
             ) * 100
 
-            print(
-                f"Margen potencial: "
-                f"{margen:.2f}%"
-            )
+            print(f"Margen potencial: {margen:.2f}%")
 
     else:
         print(
             "Ganancia potencial: NO DISPONIBLE "
             "para todos los productos."
         )
+
+
+def mostrar_resumen_ejecutivo():
+    print("\n===== RESUMEN EJECUTIVO =====")
+
+    ingresos_totales = 0
+    ganancia_conocida = 0
+    costos_ventas = 0
+
+    for venta in ventas:
+        ingresos_totales += convertir_numero(
+            venta["monto"]
+        )
+
+        if "ganancia" in venta:
+            ganancia_conocida += convertir_numero(
+                venta["ganancia"]
+            )
+
+        if "costo_total" in venta:
+            costos_ventas += convertir_numero(
+                venta["costo_total"]
+            )
+
+    capital_inventario = 0
+    valor_venta_inventario = 0
+
+    for item in inventario:
+        cantidad = int(item["cantidad"])
+        precio = convertir_numero(item["precio"])
+
+        valor_venta_inventario += (
+            cantidad * precio
+        )
+
+        if "costo" in item:
+            costo = convertir_numero(item["costo"])
+            capital_inventario += (
+                cantidad * costo
+            )
+
+    ganancia_potencial_inventario = (
+        valor_venta_inventario
+        - capital_inventario
+    )
+
+    print(f"Ingresos históricos: ${ingresos_totales:.2f}")
+    print(f"Costos de ventas registrados: ${costos_ventas:.2f}")
+    print(f"Ganancia conocida realizada: ${ganancia_conocida:.2f}")
+    print()
+    print(f"Capital actual en inventario: ${capital_inventario:.2f}")
+    print(
+        f"Valor potencial del inventario: "
+        f"${valor_venta_inventario:.2f}"
+    )
+    print(
+        f"Ganancia potencial del inventario: "
+        f"${ganancia_potencial_inventario:.2f}"
+    )
+    print()
+    print("Clientes registrados:", len(clientes))
+    print("Ventas registradas:", len(ventas))
+
+    unidades = sum(
+        int(item["cantidad"])
+        for item in inventario
+    )
+
+    print("Unidades disponibles:", unidades)
+
+    valor_negocio_operativo = (
+        ganancia_conocida
+        + capital_inventario
+    )
+
+    print()
+    print(
+        f"Valor operativo conocido: "
+        f"${valor_negocio_operativo:.2f}"
+    )
 
 
 while True:
@@ -420,7 +484,8 @@ while True:
     print("9. Ganancia por producto")
     print("10. Plan de reposición")
     print("11. Valor del inventario")
-    print("12. Salir")
+    print("12. Resumen ejecutivo")
+    print("13. Salir")
 
     opcion = input("Selecciona una opción: ")
 
@@ -460,6 +525,9 @@ while True:
         mostrar_valor_inventario()
 
     elif opcion == "12":
+        mostrar_resumen_ejecutivo()
+
+    elif opcion == "13":
         print("Hasta luego.")
         break
 
