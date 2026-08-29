@@ -5,6 +5,7 @@ from inventario import (
     inventario,
     reposiciones
 )
+from gastos import mostrar_gastos, gastos
 
 
 def convertir_numero(valor):
@@ -16,28 +17,58 @@ def convertir_numero(valor):
     )
 
 
+def total_gastos_operativos():
+    total = 0
+
+    for gasto in gastos:
+        total += convertir_numero(
+            gasto["monto"]
+        )
+
+    return total
+
+
 def mostrar_resumen():
     total_clientes = len(clientes)
     total_productos = len(inventario)
 
-    unidades_disponibles = 0
+    unidades_disponibles = sum(
+        int(item["cantidad"])
+        for item in inventario
+    )
 
-    for item in inventario:
-        unidades_disponibles += int(item["cantidad"])
+    ingresos_totales = sum(
+        convertir_numero(venta["monto"])
+        for venta in ventas
+    )
 
-    ingresos_totales = 0
-
-    for venta in ventas:
-        ingresos_totales += convertir_numero(
-            venta["monto"]
-        )
+    gastos_totales = total_gastos_operativos()
 
     print("\n===== RESUMEN DEL NEGOCIO =====")
-    print("Clientes registrados:", total_clientes)
-    print("Productos en inventario:", total_productos)
-    print("Unidades disponibles:", unidades_disponibles)
-    print("Ventas registradas:", len(ventas))
-    print(f"Ingresos totales: ${ingresos_totales:.2f}")
+    print(
+        "Clientes registrados:",
+        total_clientes
+    )
+    print(
+        "Productos en inventario:",
+        total_productos
+    )
+    print(
+        "Unidades disponibles:",
+        unidades_disponibles
+    )
+    print(
+        "Ventas registradas:",
+        len(ventas)
+    )
+    print(
+        f"Ingresos totales: "
+        f"${ingresos_totales:.2f}"
+    )
+    print(
+        f"Gastos operativos: "
+        f"${gastos_totales:.2f}"
+    )
 
 
 def mostrar_reporte_clientes():
@@ -48,30 +79,38 @@ def mostrar_reporte_clientes():
         return
 
     for cliente in clientes:
-
         nombre = cliente["nombre"]
 
         ventas_cliente = [
             venta
             for venta in ventas
-            if venta["cliente"].lower() == nombre.lower()
+            if venta["cliente"].lower()
+            == nombre.lower()
         ]
 
-        total_comprado = 0
-
-        for venta in ventas_cliente:
-            total_comprado += convertir_numero(
+        total_comprado = sum(
+            convertir_numero(
                 venta["monto"]
             )
+            for venta in ventas_cliente
+        )
 
         print("-" * 30)
         print("Cliente:", nombre)
-        print("Ventas realizadas:", len(ventas_cliente))
-        print(f"Total comprado: ${total_comprado:.2f}")
+        print(
+            "Ventas realizadas:",
+            len(ventas_cliente)
+        )
+        print(
+            f"Total comprado: "
+            f"${total_comprado:.2f}"
+        )
 
 
 def mostrar_productos_mas_vendidos():
-    print("\n===== PRODUCTOS MÁS VENDIDOS =====")
+    print(
+        "\n===== PRODUCTOS MÁS VENDIDOS ====="
+    )
 
     if not ventas:
         print("No hay ventas registradas.")
@@ -80,7 +119,6 @@ def mostrar_productos_mas_vendidos():
     reporte = {}
 
     for venta in ventas:
-
         producto = venta["producto"]
         cantidad = int(
             venta.get("cantidad", 1)
@@ -95,8 +133,13 @@ def mostrar_productos_mas_vendidos():
                 "ingresos": 0
             }
 
-        reporte[producto]["cantidad"] += cantidad
-        reporte[producto]["ingresos"] += monto
+        reporte[producto][
+            "cantidad"
+        ] += cantidad
+
+        reporte[producto][
+            "ingresos"
+        ] += monto
 
     productos_ordenados = sorted(
         reporte.items(),
@@ -104,13 +147,17 @@ def mostrar_productos_mas_vendidos():
         reverse=True
     )
 
-    for posicion, (producto, datos) in enumerate(
+    for posicion, (
+        producto,
+        datos
+    ) in enumerate(
         productos_ordenados,
         start=1
     ):
-
         print("-" * 30)
-        print(f"{posicion}. {producto}")
+        print(
+            f"{posicion}. {producto}"
+        )
         print(
             "Unidades vendidas:",
             datos["cantidad"]
@@ -122,19 +169,18 @@ def mostrar_productos_mas_vendidos():
 
 
 def mostrar_alerta_inventario():
-    print("\n===== ALERTA DE INVENTARIO =====")
+    print(
+        "\n===== ALERTA DE INVENTARIO ====="
+    )
 
     limite_bajo = 5
-    productos_bajos = []
 
-    for item in inventario:
-
-        cantidad = int(
-            item["cantidad"]
-        )
-
-        if cantidad <= limite_bajo:
-            productos_bajos.append(item)
+    productos_bajos = [
+        item
+        for item in inventario
+        if int(item["cantidad"])
+        <= limite_bajo
+    ]
 
     if not productos_bajos:
         print("Inventario en buen nivel.")
@@ -145,16 +191,19 @@ def mostrar_alerta_inventario():
     )
 
     for item in productos_bajos:
-
         cantidad = int(
             item["cantidad"]
         )
 
-        producto = item["producto"]
-
         print("-" * 30)
-        print("Producto:", producto)
-        print("Stock actual:", cantidad)
+        print(
+            "Producto:",
+            item["producto"]
+        )
+        print(
+            "Stock actual:",
+            cantidad
+        )
 
         if cantidad == 0:
             print("Estado: AGOTADO")
@@ -163,7 +212,9 @@ def mostrar_alerta_inventario():
 
 
 def mostrar_reporte_financiero():
-    print("\n===== REPORTE FINANCIERO =====")
+    print(
+        "\n===== REPORTE FINANCIERO ====="
+    )
 
     if not ventas:
         print("No hay ventas registradas.")
@@ -177,7 +228,6 @@ def mostrar_reporte_financiero():
     ventas_sin_costo = 0
 
     for venta in ventas:
-
         monto = convertir_numero(
             venta["monto"]
         )
@@ -188,7 +238,6 @@ def mostrar_reporte_financiero():
             "costo_total" in venta
             and "ganancia" in venta
         ):
-
             costo_total = convertir_numero(
                 venta["costo_total"]
             )
@@ -205,19 +254,40 @@ def mostrar_reporte_financiero():
         else:
             ventas_sin_costo += 1
 
+    gastos_totales = (
+        total_gastos_operativos()
+    )
+
+    resultado_operativo = (
+        ganancia_conocida
+        - gastos_totales
+    )
+
     print(
         f"Ingresos totales: "
         f"${ingresos_totales:.2f}"
     )
 
     print(
-        f"Costos registrados: "
+        f"Costos de productos registrados: "
         f"${costos_totales:.2f}"
     )
 
     print(
-        f"Ganancia neta conocida: "
+        f"Ganancia bruta conocida: "
         f"${ganancia_conocida:.2f}"
+    )
+
+    print(
+        f"Gastos operativos registrados: "
+        f"${gastos_totales:.2f}"
+    )
+
+    print("-" * 30)
+
+    print(
+        f"Resultado operativo conocido: "
+        f"${resultado_operativo:.2f}"
     )
 
     print()
@@ -233,34 +303,33 @@ def mostrar_reporte_financiero():
     )
 
     if ventas_sin_costo > 0:
-
         print()
-
         print(
-            "Nota: La ganancia neta no incluye las "
-            "ventas antiguas que no tienen costo registrado."
+            "Nota: El resultado operativo "
+            "no incluye el costo de las ventas "
+            "históricas que no tienen costo registrado."
         )
 
     if ingresos_con_costo > 0:
-
         margen = (
             ganancia_conocida
             / ingresos_con_costo
         ) * 100
 
         print(
-            f"Margen sobre ventas con costo: "
+            f"Margen bruto conocido: "
             f"{margen:.2f}%"
         )
 
 
 def mostrar_ganancia_por_producto():
-    print("\n===== GANANCIA POR PRODUCTO =====")
+    print(
+        "\n===== GANANCIA POR PRODUCTO ====="
+    )
 
     reporte = {}
 
     for venta in ventas:
-
         if "ganancia" not in venta:
             continue
 
@@ -279,16 +348,23 @@ def mostrar_ganancia_por_producto():
         )
 
         if producto not in reporte:
-
             reporte[producto] = {
                 "cantidad": 0,
                 "ingresos": 0,
                 "ganancia": 0
             }
 
-        reporte[producto]["cantidad"] += cantidad
-        reporte[producto]["ingresos"] += ingreso
-        reporte[producto]["ganancia"] += ganancia
+        reporte[producto][
+            "cantidad"
+        ] += cantidad
+
+        reporte[producto][
+            "ingresos"
+        ] += ingreso
+
+        reporte[producto][
+            "ganancia"
+        ] += ganancia
 
     if not reporte:
         print(
@@ -302,38 +378,37 @@ def mostrar_ganancia_por_producto():
         reverse=True
     )
 
-    for posicion, (producto, datos) in enumerate(
+    for posicion, (
+        producto,
+        datos
+    ) in enumerate(
         productos_ordenados,
         start=1
     ):
-
         margen = 0
 
         if datos["ingresos"] > 0:
-
             margen = (
                 datos["ganancia"]
                 / datos["ingresos"]
             ) * 100
 
         print("-" * 30)
-        print(f"{posicion}. {producto}")
-
+        print(
+            f"{posicion}. {producto}"
+        )
         print(
             "Unidades vendidas con costo:",
             datos["cantidad"]
         )
-
         print(
             f"Ingresos: "
             f"${datos['ingresos']:.2f}"
         )
-
         print(
             f"Ganancia: "
             f"${datos['ganancia']:.2f}"
         )
-
         print(
             f"Margen: "
             f"{margen:.2f}%"
@@ -341,7 +416,9 @@ def mostrar_ganancia_por_producto():
 
 
 def mostrar_plan_reposicion():
-    print("\n===== PLAN DE REPOSICIÓN =====")
+    print(
+        "\n===== PLAN DE REPOSICIÓN ====="
+    )
 
     limite_bajo = 5
     stock_objetivo = 10
@@ -350,35 +427,35 @@ def mostrar_plan_reposicion():
     inversion_total = 0
 
     for item in inventario:
-
         cantidad_actual = int(
             item["cantidad"]
         )
 
         if cantidad_actual <= limite_bajo:
 
-            if "costo" not in item:
+            faltantes = (
+                stock_objetivo
+                - cantidad_actual
+            )
 
+            if "costo" not in item:
                 productos_reponer.append({
-                    "producto": item["producto"],
-                    "cantidad_actual": cantidad_actual,
-                    "faltantes": (
-                        stock_objetivo
-                        - cantidad_actual
-                    ),
-                    "costo": None,
-                    "inversion": None
+                    "producto":
+                        item["producto"],
+                    "cantidad_actual":
+                        cantidad_actual,
+                    "faltantes":
+                        faltantes,
+                    "costo":
+                        None,
+                    "inversion":
+                        None
                 })
 
                 continue
 
             costo = convertir_numero(
                 item["costo"]
-            )
-
-            faltantes = (
-                stock_objetivo
-                - cantidad_actual
             )
 
             inversion = (
@@ -388,64 +465,58 @@ def mostrar_plan_reposicion():
             inversion_total += inversion
 
             productos_reponer.append({
-                "producto": item["producto"],
-                "cantidad_actual": cantidad_actual,
-                "faltantes": faltantes,
-                "costo": costo,
-                "inversion": inversion
+                "producto":
+                    item["producto"],
+                "cantidad_actual":
+                    cantidad_actual,
+                "faltantes":
+                    faltantes,
+                "costo":
+                    costo,
+                "inversion":
+                    inversion
             })
 
     if not productos_reponer:
-
         print(
             "No hay productos que "
             "necesiten reposición."
         )
-
         return
 
     for item in productos_reponer:
-
         print("-" * 30)
         print(
             "Producto:",
             item["producto"]
         )
-
         print(
             "Stock actual:",
             item["cantidad_actual"]
         )
-
         print(
             "Stock objetivo:",
             stock_objetivo
         )
-
         print(
             "Unidades a comprar:",
             item["faltantes"]
         )
 
         if item["costo"] is None:
-
             print(
                 "Costo unitario: "
                 "NO REGISTRADO"
             )
-
             print(
                 "Inversión necesaria: "
                 "NO DISPONIBLE"
             )
-
         else:
-
             print(
                 f"Costo unitario: "
                 f"${item['costo']:.2f}"
             )
-
             print(
                 f"Inversión necesaria: "
                 f"${item['inversion']:.2f}"
@@ -454,13 +525,16 @@ def mostrar_plan_reposicion():
     print("-" * 30)
 
     print(
-        f"Inversión total conocida para reposición: "
+        f"Inversión total conocida "
+        f"para reposición: "
         f"${inversion_total:.2f}"
     )
 
 
 def mostrar_valor_inventario():
-    print("\n===== VALOR DEL INVENTARIO =====")
+    print(
+        "\n===== VALOR DEL INVENTARIO ====="
+    )
 
     if not inventario:
         print(
@@ -468,100 +542,73 @@ def mostrar_valor_inventario():
         )
         return
 
-    costo_total_inventario = 0
+    costo_total = 0
     valor_venta_total = 0
     productos_sin_costo = 0
 
     for item in inventario:
-
         cantidad = int(
             item["cantidad"]
         )
 
-        precio_venta = convertir_numero(
+        precio = convertir_numero(
             item["precio"]
         )
 
         valor_venta = (
-            cantidad * precio_venta
+            cantidad * precio
         )
 
         valor_venta_total += valor_venta
 
-        if "costo" in item:
+        print("-" * 30)
+        print(
+            "Producto:",
+            item["producto"]
+        )
+        print(
+            "Unidades:",
+            cantidad
+        )
 
+        if "costo" in item:
             costo_unitario = convertir_numero(
                 item["costo"]
             )
 
-            costo_total = (
-                cantidad * costo_unitario
-            )
-
-            costo_total_inventario += costo_total
-
-            print("-" * 30)
-            print(
-                "Producto:",
-                item["producto"]
-            )
-
-            print(
-                "Unidades:",
+            capital = (
                 cantidad
+                * costo_unitario
             )
+
+            costo_total += capital
 
             print(
                 f"Costo unitario: "
                 f"${costo_unitario:.2f}"
             )
-
             print(
                 f"Capital invertido: "
-                f"${costo_total:.2f}"
-            )
-
-            print(
-                f"Valor potencial de venta: "
-                f"${valor_venta:.2f}"
+                f"${capital:.2f}"
             )
 
         else:
-
             productos_sin_costo += 1
-
-            print("-" * 30)
-
-            print(
-                "Producto:",
-                item["producto"]
-            )
-
-            print(
-                "Unidades:",
-                cantidad
-            )
-
             print(
                 "Costo unitario: "
                 "NO REGISTRADO"
             )
 
-            print(
-                f"Valor potencial de venta: "
-                f"${valor_venta:.2f}"
-            )
-
-    ganancia_potencial = (
-        valor_venta_total
-        - costo_total_inventario
-    )
+        print(
+            f"Valor potencial de venta: "
+            f"${valor_venta:.2f}"
+        )
 
     print("-" * 30)
 
     print(
         f"Costo total del inventario conocido: "
-        f"${costo_total_inventario:.2f}"
+        f"${costo_total:.2f}"
     )
 
     print(
@@ -570,6 +617,10 @@ def mostrar_valor_inventario():
     )
 
     if productos_sin_costo == 0:
+        ganancia_potencial = (
+            valor_venta_total
+            - costo_total
+        )
 
         print(
             f"Ganancia potencial del inventario: "
@@ -577,7 +628,6 @@ def mostrar_valor_inventario():
         )
 
         if valor_venta_total > 0:
-
             margen = (
                 ganancia_potencial
                 / valor_venta_total
@@ -588,44 +638,48 @@ def mostrar_valor_inventario():
                 f"{margen:.2f}%"
             )
 
-    else:
-
-        print(
-            "Ganancia potencial: "
-            "NO DISPONIBLE para todos los productos."
-        )
-
 
 def mostrar_resumen_ejecutivo():
-    print("\n===== RESUMEN EJECUTIVO =====")
+    print(
+        "\n===== RESUMEN EJECUTIVO ====="
+    )
 
-    ingresos_totales = 0
-    ganancia_conocida = 0
-    costos_ventas = 0
-
-    for venta in ventas:
-
-        ingresos_totales += convertir_numero(
+    ingresos = sum(
+        convertir_numero(
             venta["monto"]
         )
+        for venta in ventas
+    )
 
-        if "ganancia" in venta:
+    ganancia_conocida = sum(
+        convertir_numero(
+            venta["ganancia"]
+        )
+        for venta in ventas
+        if "ganancia" in venta
+    )
 
-            ganancia_conocida += convertir_numero(
-                venta["ganancia"]
-            )
+    costos_ventas = sum(
+        convertir_numero(
+            venta["costo_total"]
+        )
+        for venta in ventas
+        if "costo_total" in venta
+    )
 
-        if "costo_total" in venta:
+    gastos_totales = (
+        total_gastos_operativos()
+    )
 
-            costos_ventas += convertir_numero(
-                venta["costo_total"]
-            )
+    resultado_operativo = (
+        ganancia_conocida
+        - gastos_totales
+    )
 
     capital_inventario = 0
     valor_venta_inventario = 0
 
     for item in inventario:
-
         cantidad = int(
             item["cantidad"]
         )
@@ -639,7 +693,6 @@ def mostrar_resumen_ejecutivo():
         )
 
         if "costo" in item:
-
             costo = convertir_numero(
                 item["costo"]
             )
@@ -648,14 +701,9 @@ def mostrar_resumen_ejecutivo():
                 cantidad * costo
             )
 
-    ganancia_potencial_inventario = (
-        valor_venta_inventario
-        - capital_inventario
-    )
-
     print(
         f"Ingresos históricos: "
-        f"${ingresos_totales:.2f}"
+        f"${ingresos:.2f}"
     )
 
     print(
@@ -664,8 +712,18 @@ def mostrar_resumen_ejecutivo():
     )
 
     print(
-        f"Ganancia conocida realizada: "
+        f"Ganancia bruta conocida: "
         f"${ganancia_conocida:.2f}"
+    )
+
+    print(
+        f"Gastos operativos: "
+        f"${gastos_totales:.2f}"
+    )
+
+    print(
+        f"Resultado operativo conocido: "
+        f"${resultado_operativo:.2f}"
     )
 
     print()
@@ -680,9 +738,14 @@ def mostrar_resumen_ejecutivo():
         f"${valor_venta_inventario:.2f}"
     )
 
+    ganancia_potencial = (
+        valor_venta_inventario
+        - capital_inventario
+    )
+
     print(
         f"Ganancia potencial del inventario: "
-        f"${ganancia_potencial_inventario:.2f}"
+        f"${ganancia_potencial:.2f}"
     )
 
     print()
@@ -707,42 +770,37 @@ def mostrar_resumen_ejecutivo():
         unidades
     )
 
-    valor_negocio_operativo = (
-        ganancia_conocida
-        + capital_inventario
-    )
-
-    print()
-
-    print(
-        f"Valor operativo conocido: "
-        f"${valor_negocio_operativo:.2f}"
-    )
-
 
 def mostrar_flujo_caja():
     print("\n===== FLUJO DE CAJA =====")
 
-    entradas_ventas = 0
-
-    for venta in ventas:
-        entradas_ventas += convertir_numero(
+    entradas_ventas = sum(
+        convertir_numero(
             venta["monto"]
         )
+        for venta in ventas
+    )
 
-    salidas_reposicion = 0
+    salidas_reposicion = sum(
+        convertir_numero(
+            reposicion["inversion"]
+        )
+        for reposicion in reposiciones
+        if "inversion" in reposicion
+    )
 
-    for reposicion in reposiciones:
+    salidas_gastos = (
+        total_gastos_operativos()
+    )
 
-        if "inversion" in reposicion:
-
-            salidas_reposicion += convertir_numero(
-                reposicion["inversion"]
-            )
+    salidas_totales = (
+        salidas_reposicion
+        + salidas_gastos
+    )
 
     flujo_neto = (
         entradas_ventas
-        - salidas_reposicion
+        - salidas_totales
     )
 
     print(
@@ -755,23 +813,21 @@ def mostrar_flujo_caja():
         f"${salidas_reposicion:.2f}"
     )
 
+    print(
+        f"Salidas por gastos operativos: "
+        f"${salidas_gastos:.2f}"
+    )
+
+    print(
+        f"Salidas totales: "
+        f"${salidas_totales:.2f}"
+    )
+
     print("-" * 30)
 
     print(
         f"Flujo de caja neto registrado: "
         f"${flujo_neto:.2f}"
-    )
-
-    print()
-
-    print(
-        "Ventas registradas:",
-        len(ventas)
-    )
-
-    print(
-        "Reposiciones registradas:",
-        len(reposiciones)
     )
 
     if flujo_neto > 0:
@@ -781,18 +837,12 @@ def mostrar_flujo_caja():
         print("Estado del flujo: NEGATIVO")
 
     else:
-        print("Estado del flujo: EQUILIBRADO")
-
-    print()
-
-    print(
-        "Nota: Este flujo utiliza únicamente "
-        "movimientos registrados en el sistema."
-    )
+        print(
+            "Estado del flujo: EQUILIBRADO"
+        )
 
 
 while True:
-
     print("=" * 50)
     print("       AI BUSINESS ASSISTANT")
     print("=" * 50)
@@ -800,17 +850,18 @@ while True:
     print("1. Clientes")
     print("2. Ventas")
     print("3. Inventario")
-    print("4. Resumen del negocio")
-    print("5. Reporte por cliente")
-    print("6. Productos más vendidos")
-    print("7. Alerta de inventario")
-    print("8. Reporte financiero")
-    print("9. Ganancia por producto")
-    print("10. Plan de reposición")
-    print("11. Valor del inventario")
-    print("12. Resumen ejecutivo")
-    print("13. Flujo de caja")
-    print("14. Salir")
+    print("4. Gastos")
+    print("5. Resumen del negocio")
+    print("6. Reporte por cliente")
+    print("7. Productos más vendidos")
+    print("8. Alerta de inventario")
+    print("9. Reporte financiero")
+    print("10. Ganancia por producto")
+    print("11. Plan de reposición")
+    print("12. Valor del inventario")
+    print("13. Resumen ejecutivo")
+    print("14. Flujo de caja")
+    print("15. Salir")
 
     opcion = input(
         "Selecciona una opción: "
@@ -828,36 +879,39 @@ while True:
         mostrar_inventario()
 
     elif opcion == "4":
-        mostrar_resumen()
+        mostrar_gastos()
 
     elif opcion == "5":
-        mostrar_reporte_clientes()
+        mostrar_resumen()
 
     elif opcion == "6":
-        mostrar_productos_mas_vendidos()
+        mostrar_reporte_clientes()
 
     elif opcion == "7":
-        mostrar_alerta_inventario()
+        mostrar_productos_mas_vendidos()
 
     elif opcion == "8":
-        mostrar_reporte_financiero()
+        mostrar_alerta_inventario()
 
     elif opcion == "9":
-        mostrar_ganancia_por_producto()
+        mostrar_reporte_financiero()
 
     elif opcion == "10":
-        mostrar_plan_reposicion()
+        mostrar_ganancia_por_producto()
 
     elif opcion == "11":
-        mostrar_valor_inventario()
+        mostrar_plan_reposicion()
 
     elif opcion == "12":
-        mostrar_resumen_ejecutivo()
+        mostrar_valor_inventario()
 
     elif opcion == "13":
-        mostrar_flujo_caja()
+        mostrar_resumen_ejecutivo()
 
     elif opcion == "14":
+        mostrar_flujo_caja()
+
+    elif opcion == "15":
         print("Hasta luego.")
         break
 
@@ -867,5 +921,4 @@ while True:
     input(
         "\nPresiona ENTER para volver al menú..."
     )
-
     print()
