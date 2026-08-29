@@ -202,6 +202,62 @@ def mostrar_reporte_financiero():
         )
 
 
+def mostrar_ganancia_por_producto():
+    print("\n===== GANANCIA POR PRODUCTO =====")
+
+    reporte = {}
+
+    for venta in ventas:
+
+        if "ganancia" not in venta:
+            continue
+
+        producto = venta["producto"]
+        cantidad = int(venta.get("cantidad", 1))
+        ingreso = convertir_numero(venta["monto"])
+        ganancia = convertir_numero(venta["ganancia"])
+
+        if producto not in reporte:
+            reporte[producto] = {
+                "cantidad": 0,
+                "ingresos": 0,
+                "ganancia": 0
+            }
+
+        reporte[producto]["cantidad"] += cantidad
+        reporte[producto]["ingresos"] += ingreso
+        reporte[producto]["ganancia"] += ganancia
+
+    if not reporte:
+        print("No hay ventas con costos registrados.")
+        return
+
+    productos_ordenados = sorted(
+        reporte.items(),
+        key=lambda item: item[1]["ganancia"],
+        reverse=True
+    )
+
+    for posicion, (producto, datos) in enumerate(
+        productos_ordenados,
+        start=1
+    ):
+        margen = 0
+
+        if datos["ingresos"] > 0:
+            margen = (
+                datos["ganancia"]
+                / datos["ingresos"]
+            ) * 100
+
+        print("-" * 30)
+        print(f"{posicion}. {producto}")
+        print("Unidades vendidas con costo:", datos["cantidad"])
+        print(f"Ingresos: ${datos['ingresos']:.2f}")
+        print(f"Ganancia: ${datos['ganancia']:.2f}")
+        print(f"Margen: {margen:.2f}%")
+
+
 while True:
     print("=" * 50)
     print("       AI BUSINESS ASSISTANT")
@@ -215,7 +271,8 @@ while True:
     print("6. Productos más vendidos")
     print("7. Alerta de inventario")
     print("8. Reporte financiero")
-    print("9. Salir")
+    print("9. Ganancia por producto")
+    print("10. Salir")
 
     opcion = input("Selecciona una opción: ")
 
@@ -246,6 +303,9 @@ while True:
         mostrar_reporte_financiero()
 
     elif opcion == "9":
+        mostrar_ganancia_por_producto()
+
+    elif opcion == "10":
         print("Hasta luego.")
         break
 
