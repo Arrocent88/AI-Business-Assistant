@@ -179,6 +179,7 @@ def mostrar_reporte_financiero():
         f"Ganancia neta conocida: "
         f"${ganancia_conocida:.2f}"
     )
+
     print()
     print("Ventas con costo registrado:", ventas_con_costo)
     print("Ventas históricas sin costo:", ventas_sin_costo)
@@ -324,6 +325,85 @@ def mostrar_plan_reposicion():
     )
 
 
+def mostrar_valor_inventario():
+    print("\n===== VALOR DEL INVENTARIO =====")
+
+    if not inventario:
+        print("No hay productos registrados.")
+        return
+
+    costo_total_inventario = 0
+    valor_venta_total = 0
+    productos_sin_costo = 0
+
+    for item in inventario:
+        cantidad = int(item["cantidad"])
+        precio_venta = convertir_numero(item["precio"])
+
+        valor_venta = cantidad * precio_venta
+        valor_venta_total += valor_venta
+
+        if "costo" in item:
+            costo_unitario = convertir_numero(item["costo"])
+            costo_total = cantidad * costo_unitario
+
+            costo_total_inventario += costo_total
+
+            print("-" * 30)
+            print("Producto:", item["producto"])
+            print("Unidades:", cantidad)
+            print(f"Costo unitario: ${costo_unitario:.2f}")
+            print(f"Capital invertido: ${costo_total:.2f}")
+            print(f"Valor potencial de venta: ${valor_venta:.2f}")
+
+        else:
+            productos_sin_costo += 1
+
+            print("-" * 30)
+            print("Producto:", item["producto"])
+            print("Unidades:", cantidad)
+            print("Costo unitario: NO REGISTRADO")
+            print(f"Valor potencial de venta: ${valor_venta:.2f}")
+
+    ganancia_potencial = (
+        valor_venta_total
+        - costo_total_inventario
+    )
+
+    print("-" * 30)
+    print(
+        f"Costo total del inventario conocido: "
+        f"${costo_total_inventario:.2f}"
+    )
+    print(
+        f"Valor potencial de venta: "
+        f"${valor_venta_total:.2f}"
+    )
+
+    if productos_sin_costo == 0:
+        print(
+            f"Ganancia potencial del inventario: "
+            f"${ganancia_potencial:.2f}"
+        )
+
+        if valor_venta_total > 0:
+            margen = (
+                ganancia_potencial
+                / valor_venta_total
+            ) * 100
+
+            print(
+                f"Margen potencial: "
+                f"{margen:.2f}%"
+            )
+
+    else:
+        print(
+            "Ganancia potencial: NO DISPONIBLE "
+            "para todos los productos."
+        )
+
+
 while True:
     print("=" * 50)
     print("       AI BUSINESS ASSISTANT")
@@ -339,7 +419,8 @@ while True:
     print("8. Reporte financiero")
     print("9. Ganancia por producto")
     print("10. Plan de reposición")
-    print("11. Salir")
+    print("11. Valor del inventario")
+    print("12. Salir")
 
     opcion = input("Selecciona una opción: ")
 
@@ -376,6 +457,9 @@ while True:
         mostrar_plan_reposicion()
 
     elif opcion == "11":
+        mostrar_valor_inventario()
+
+    elif opcion == "12":
         print("Hasta luego.")
         break
 
