@@ -4,5 +4,11 @@
         "categoria": "tramsporte",
         "monto": 20.0,
         "fecha": "2026-08-29"
+    },
+    {
+        "descripcion": "Estacionamiento",
+        "categoria": "Transporte",
+        "monto": 10.0,
+        "fecha": "2026-08-30"
     }
 ]

@@ -1,8 +1,15 @@
 [
     {
         "producto": "Aceite 15W/40",
-        "cantidad": "10",
+        "cantidad": 9,
         "precio": "$25",
         "costo": 15.0
+    },
+    {
+        "codigo": "FIL-001",
+        "producto": "Filtro de aceite",
+        "cantidad": 10,
+        "costo": 7.5,
+        "precio": 16.0
     }
 ]

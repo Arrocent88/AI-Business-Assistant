@@ -7,5 +7,13 @@
         "stock_anterior": 2,
         "stock_nuevo": 10,
         "costo_promedio_nuevo": 15.0
+    },
+    {
+        "codigo": "FIL-001",
+        "producto": "Filtro de aceite",
+        "cantidad": 5,
+        "costo_unitario": 7.0,
+        "inversion": 35.0,
+        "fecha": "2026-08-30"
     }
 ]
