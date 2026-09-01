@@ -1,9 +1,10 @@
 [
     {
         "producto": "Aceite 15W/40",
-        "cantidad": 9,
-        "precio": "$25",
-        "costo": 15.0
+        "cantidad": 6,
+        "precio": 25.0,
+        "costo": 15.0,
+        "codigo": "ACE-001"
     },
     {
         "codigo": "FIL-001",

@@ -8,35 +8,40 @@
         "cliente": "Pedro Hernandez",
         "producto": "Aceite 15W/40",
         "cantidad": 2,
-        "monto": "50"
+        "monto": "50",
+        "codigo_producto": "ACE-001"
     },
     {
         "cliente": "Pedro Hernandez",
         "producto": "Aceite 15W/40",
         "cantidad": 2,
         "precio_unitario": 25.0,
-        "monto": 50.0
+        "monto": 50.0,
+        "codigo_producto": "ACE-001"
     },
     {
         "cliente": "Pedro Hernandez",
         "producto": "Aceite 15W/40",
         "cantidad": 1,
         "precio_unitario": 25.0,
-        "monto": 25.0
+        "monto": 25.0,
+        "codigo_producto": "ACE-001"
     },
     {
         "cliente": "Pablo",
         "producto": "Aceite 15W/40",
         "cantidad": 1,
         "precio_unitario": 25.0,
-        "monto": 25.0
+        "monto": 25.0,
+        "codigo_producto": "ACE-001"
     },
     {
         "cliente": "Pedro Hernandez",
         "producto": "Aceite 15W/40",
         "cantidad": 1,
         "precio_unitario": 25.0,
-        "monto": 25.0
+        "monto": 25.0,
+        "codigo_producto": "ACE-001"
     },
     {
         "cliente": "Pedro Hernandez",
@@ -46,7 +51,8 @@
         "monto": 25.0,
         "costo_unitario": 15.0,
         "costo_total": 15.0,
-        "ganancia": 10.0
+        "ganancia": 10.0,
+        "codigo_producto": "ACE-001"
     },
     {
         "cliente": "Maria Lopez",
@@ -56,6 +62,31 @@
         "monto": 25.0,
         "costo_unitario": 15.0,
         "costo_total": 15.0,
-        "ganancia": 10.0
+        "ganancia": 10.0,
+        "codigo_producto": "ACE-001"
+    },
+    {
+        "cliente": "Maria Lopez",
+        "producto": "Aceite 15W/40",
+        "codigo_producto": "ACE-001",
+        "cantidad": 1,
+        "precio_unitario": 25.0,
+        "monto": 25.0,
+        "costo_unitario": 15.0,
+        "costo_total": 15.0,
+        "ganancia": 10.0,
+        "fecha": "2026-09-01"
+    },
+    {
+        "cliente": "Pedro Hernandez",
+        "producto": "Aceite 15W/40",
+        "codigo_producto": "ACE-001",
+        "cantidad": 2,
+        "precio_unitario": 25.0,
+        "monto": 50.0,
+        "costo_unitario": 15.0,
+        "costo_total": 30.0,
+        "ganancia": 20.0,
+        "fecha": "2026-09-01"
     }
 ]
