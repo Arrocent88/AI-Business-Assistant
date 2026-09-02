@@ -130,9 +130,7 @@ def abrir_registro_cliente():
         v,
         text="REGISTRAR CLIENTE",
         font=("Arial", 17, "bold")
-    ).pack(
-        pady=(25, 20)
-    )
+    ).pack(pady=(25, 20))
 
     tk.Label(
         v,
@@ -178,9 +176,7 @@ def abrir_clientes():
         text="+ Registrar cliente",
         width=20,
         command=abrir_registro_cliente
-    ).pack(
-        pady=(0, 15)
-    )
+    ).pack(pady=(0, 15))
 
     for numero, cliente in enumerate(
         clientes,
@@ -239,12 +235,11 @@ def registrar_producto(
         return
 
     for item in inventario:
-        if (
-            str(
-                item.get("codigo", "")
-            ).strip().upper()
-            == codigo
-        ):
+        codigo_existente = str(
+            item.get("codigo", "")
+        ).strip().upper()
+
+        if codigo_existente == codigo:
             messagebox.showwarning(
                 "Código duplicado",
                 f"Ya existe el código {codigo}."
@@ -317,9 +312,7 @@ def abrir_registro_producto():
         v,
         text="REGISTRAR PRODUCTO",
         font=("Arial", 18, "bold")
-    ).pack(
-        pady=(25, 20)
-    )
+    ).pack(pady=(25, 20))
 
     campos = {}
 
@@ -477,10 +470,7 @@ def abrir_editor_producto(indice):
         pady=(25, 20)
     )
 
-    tk.Label(
-        v,
-        text="Código:"
-    ).pack()
+    tk.Label(v, text="Código:").pack()
 
     codigo = tk.Entry(
         v,
@@ -707,7 +697,6 @@ def registrar_reposicion(
     ) / nuevo_stock
 
     producto["cantidad"] = nuevo_stock
-
     producto["costo"] = round(
         costo_promedio,
         2
@@ -850,7 +839,7 @@ def abrir_reposicion():
 
 
 # ==================================================
-# HISTORIAL REPOSICIONES
+# HISTORIAL DE REPOSICIONES
 # ==================================================
 
 def abrir_historial_reposiciones():
@@ -906,8 +895,7 @@ def abrir_historial_reposiciones():
             contenido,
             text=f"Reposición {numero}",
             padx=20,
-            pady=10,
-            width=740
+            pady=10
         )
 
         caja.pack(
@@ -920,7 +908,7 @@ def abrir_historial_reposiciones():
             caja,
             text=(
                 "Código: "
-                f"{reposicion.get('codigo', 'SIN CÓDIGO') or 'SIN CÓDIGO'}"
+                f"{reposicion.get('codigo', '') or 'SIN CÓDIGO'}"
             )
         ).pack(anchor="w")
 
@@ -968,7 +956,7 @@ def abrir_historial_reposiciones():
     tk.Label(
         v,
         text=(
-            f"Inversión total en reposiciones: "
+            "Inversión total en reposiciones: "
             f"${total:.2f}"
         ),
         font=("Arial", 12, "bold")
@@ -1026,15 +1014,18 @@ def abrir_lista_compra():
 
             if cantidad_comprar > 0:
                 productos_comprar.append({
-                    "codigo": item.get(
-                        "codigo",
-                        ""
-                    ),
-                    "producto": item.get(
-                        "producto",
-                        ""
-                    ),
-                    "stock": stock,
+                    "codigo":
+                        item.get(
+                            "codigo",
+                            ""
+                        ),
+                    "producto":
+                        item.get(
+                            "producto",
+                            ""
+                        ),
+                    "stock":
+                        stock,
                     "cantidad_comprar":
                         cantidad_comprar,
                     "costo":
@@ -1061,8 +1052,7 @@ def abrir_lista_compra():
     ):
         codigo = (
             item["codigo"]
-            if item["codigo"]
-            else "SIN CÓDIGO"
+            or "SIN CÓDIGO"
         )
 
         inversion = (
@@ -1076,8 +1066,7 @@ def abrir_lista_compra():
             contenido,
             text=f"Producto {numero}",
             padx=20,
-            pady=10,
-            width=740
+            pady=10
         )
 
         caja.pack(
@@ -1223,7 +1212,7 @@ def abrir_inventario():
         pady=(0, 10)
     )
 
-    opciones_botones = [
+    opciones = [
         (
             "+ Registrar producto",
             abrir_registro_producto
@@ -1249,7 +1238,7 @@ def abrir_inventario():
     for indice, (
         texto,
         comando
-    ) in enumerate(opciones_botones):
+    ) in enumerate(opciones):
 
         tk.Button(
             botones,
@@ -1349,15 +1338,24 @@ def abrir_inventario():
             )
 
             cantidad = int(
-                item.get("cantidad", 0)
+                item.get(
+                    "cantidad",
+                    0
+                )
             )
 
             costo = convertir_numero(
-                item.get("costo", 0)
+                item.get(
+                    "costo",
+                    0
+                )
             )
 
             precio = convertir_numero(
-                item.get("precio", 0)
+                item.get(
+                    "precio",
+                    0
+                )
             )
 
             valor = (
@@ -1369,8 +1367,7 @@ def abrir_inventario():
                 text=nombre,
                 font=("Arial", 12, "bold"),
                 padx=20,
-                pady=10,
-                width=820
+                pady=10
             )
 
             caja.pack(
@@ -1571,8 +1568,7 @@ def abrir_registro_venta():
 
     etiqueta_precio = tk.Label(
         marco_calculo,
-        text="Precio unitario: $0.00",
-        font=("Arial", 11)
+        text="Precio unitario: $0.00"
     )
 
     etiqueta_precio.pack(
@@ -1582,8 +1578,7 @@ def abrir_registro_venta():
 
     etiqueta_costo = tk.Label(
         marco_calculo,
-        text="Costo unitario: $0.00",
-        font=("Arial", 11)
+        text="Costo unitario: $0.00"
     )
 
     etiqueta_costo.pack(
@@ -1593,8 +1588,7 @@ def abrir_registro_venta():
 
     etiqueta_costo_total = tk.Label(
         marco_calculo,
-        text="Costo total: $0.00",
-        font=("Arial", 11)
+        text="Costo total: $0.00"
     )
 
     etiqueta_costo_total.pack(
@@ -1752,7 +1746,6 @@ def abrir_registro_venta():
             etiqueta_info.config(
                 text=""
             )
-
             calcular_venta()
             return
 
@@ -1919,7 +1912,7 @@ def abrir_registro_venta():
             total_venta - costo_total
         )
 
-        nueva_venta = {
+        ventas.append({
             "cliente": cliente.get(
                 "nombre",
                 ""
@@ -1929,10 +1922,11 @@ def abrir_registro_venta():
                     "codigo",
                     ""
                 ),
-            "producto": producto.get(
-                "producto",
-                ""
-            ),
+            "producto":
+                producto.get(
+                    "producto",
+                    ""
+                ),
             "cantidad": cantidad,
             "costo_unitario": costo,
             "precio_unitario": precio,
@@ -1942,11 +1936,7 @@ def abrir_registro_venta():
             "fecha": datetime.now().strftime(
                 "%Y-%m-%d"
             )
-        }
-
-        ventas.append(
-            nueva_venta
-        )
+        })
 
         producto["cantidad"] = (
             stock - cantidad
@@ -1995,6 +1985,241 @@ def abrir_registro_venta():
 
 
 # ==================================================
+# HISTORIAL DE VENTAS
+# ==================================================
+
+def abrir_historial_ventas():
+    v = tk.Toplevel(ventana)
+
+    v.title("Historial de ventas")
+    v.geometry("900x700")
+    v.resizable(False, False)
+
+    tk.Label(
+        v,
+        text="HISTORIAL DE VENTAS",
+        font=("Arial", 18, "bold")
+    ).pack(
+        pady=(20, 10)
+    )
+
+    marco_busqueda = tk.Frame(v)
+
+    marco_busqueda.pack(
+        pady=(0, 10)
+    )
+
+    tk.Label(
+        marco_busqueda,
+        text="Buscar cliente, código o producto:",
+        font=("Arial", 11, "bold")
+    ).pack(
+        side="left",
+        padx=(0, 10)
+    )
+
+    variable_busqueda = tk.StringVar()
+
+    entrada = tk.Entry(
+        marco_busqueda,
+        textvariable=variable_busqueda,
+        width=35,
+        font=("Arial", 11)
+    )
+
+    entrada.pack(
+        side="left"
+    )
+
+    contenido = crear_area_scroll(v)
+
+    etiqueta_totales = tk.Label(
+        v,
+        text="",
+        font=("Arial", 11, "bold")
+    )
+
+    etiqueta_totales.pack(
+        pady=5
+    )
+
+    def mostrar_historial(*args):
+        for widget in (
+            contenido.winfo_children()
+        ):
+            widget.destroy()
+
+        busqueda = (
+            variable_busqueda.get()
+            .strip()
+            .lower()
+        )
+
+        encontradas = []
+
+        total_filtrado = 0
+        ganancia_filtrada = 0
+
+        for venta in ventas:
+            cliente = str(
+                venta.get("cliente", "")
+            )
+
+            codigo = str(
+                venta.get(
+                    "codigo_producto",
+                    ""
+                )
+            )
+
+            producto = str(
+                venta.get("producto", "")
+            )
+
+            texto = (
+                cliente.lower()
+                + " "
+                + codigo.lower()
+                + " "
+                + producto.lower()
+            )
+
+            if (
+                not busqueda
+                or busqueda in texto
+            ):
+                encontradas.append(
+                    venta
+                )
+
+        for numero, venta in enumerate(
+            encontradas,
+            start=1
+        ):
+            monto = convertir_numero(
+                venta.get("monto", 0)
+            )
+
+            total_filtrado += monto
+
+            caja = tk.LabelFrame(
+                contenido,
+                text=f"Venta {numero}",
+                font=("Arial", 11, "bold"),
+                padx=20,
+                pady=10
+            )
+
+            caja.pack(
+                fill="x",
+                padx=5,
+                pady=7
+            )
+
+            tk.Label(
+                caja,
+                text=(
+                    f"Cliente: "
+                    f"{venta.get('cliente', '')}"
+                )
+            ).pack(anchor="w")
+
+            tk.Label(
+                caja,
+                text=(
+                    f"Código: "
+                    f"{venta.get('codigo_producto', '') or 'SIN CÓDIGO'}"
+                )
+            ).pack(anchor="w")
+
+            tk.Label(
+                caja,
+                text=(
+                    f"Producto: "
+                    f"{venta.get('producto', '')}"
+                )
+            ).pack(anchor="w")
+
+            tk.Label(
+                caja,
+                text=(
+                    f"Cantidad: "
+                    f"{venta.get('cantidad', 1)}"
+                )
+            ).pack(anchor="w")
+
+            tk.Label(
+                caja,
+                text=(
+                    f"Total vendido: "
+                    f"${monto:.2f}"
+                ),
+                font=("Arial", 10, "bold")
+            ).pack(anchor="w")
+
+            if "ganancia" in venta:
+                ganancia = convertir_numero(
+                    venta.get(
+                        "ganancia",
+                        0
+                    )
+                )
+
+                ganancia_filtrada += ganancia
+
+                tk.Label(
+                    caja,
+                    text=(
+                        f"Ganancia real: "
+                        f"${ganancia:.2f}"
+                    ),
+                    font=("Arial", 10, "bold")
+                ).pack(anchor="w")
+
+            fecha = venta.get(
+                "fecha",
+                ""
+            )
+
+            if fecha:
+                tk.Label(
+                    caja,
+                    text=f"Fecha: {fecha}"
+                ).pack(anchor="w")
+
+        etiqueta_totales.config(
+            text=(
+                f"Ventas encontradas: "
+                f"{len(encontradas)}"
+                f"     |     "
+                f"Total vendido: "
+                f"${total_filtrado:.2f}"
+                f"     |     "
+                f"Ganancia conocida: "
+                f"${ganancia_filtrada:.2f}"
+            )
+        )
+
+    variable_busqueda.trace_add(
+        "write",
+        mostrar_historial
+    )
+
+    mostrar_historial()
+
+    entrada.focus()
+
+    tk.Button(
+        v,
+        text="Cerrar",
+        width=15,
+        command=v.destroy
+    ).pack(
+        pady=10
+    )
+
+
+# ==================================================
 # REPORTE DE GANANCIAS
 # ==================================================
 
@@ -2015,14 +2240,14 @@ def abrir_reporte_ganancias():
 
     contenido = crear_area_scroll(v)
 
-    ventas_con_ganancia = 0
+    ventas_con_costo = 0
     ventas_historicas = 0
 
     ingresos_conocidos = 0
     costos_conocidos = 0
     ganancia_total = 0
 
-    resumen_productos = {}
+    resumen = {}
 
     for venta in ventas:
         if (
@@ -2032,30 +2257,24 @@ def abrir_reporte_ganancias():
             ventas_historicas += 1
             continue
 
-        ventas_con_ganancia += 1
-
-        producto = venta.get(
-            "producto",
-            "Sin producto"
-        )
+        ventas_con_costo += 1
 
         codigo = venta.get(
             "codigo_producto",
             ""
         )
 
+        producto = venta.get(
+            "producto",
+            "Sin producto"
+        )
+
         cantidad = int(
-            venta.get(
-                "cantidad",
-                0
-            )
+            venta.get("cantidad", 0)
         )
 
         ingreso = convertir_numero(
-            venta.get(
-                "monto",
-                0
-            )
+            venta.get("monto", 0)
         )
 
         costo = convertir_numero(
@@ -2082,113 +2301,99 @@ def abrir_reporte_ganancias():
             else producto
         )
 
-        if clave not in resumen_productos:
-            resumen_productos[clave] = {
+        if clave not in resumen:
+            resumen[clave] = {
                 "codigo": codigo,
                 "producto": producto,
                 "cantidad": 0,
-                "ventas": 0,
-                "costo": 0,
+                "ingresos": 0,
+                "costos": 0,
                 "ganancia": 0
             }
 
-        resumen_productos[
+        resumen[
             clave
         ]["cantidad"] += cantidad
 
-        resumen_productos[
+        resumen[
             clave
-        ]["ventas"] += ingreso
+        ]["ingresos"] += ingreso
 
-        resumen_productos[
+        resumen[
             clave
-        ]["costo"] += costo
+        ]["costos"] += costo
 
-        resumen_productos[
+        resumen[
             clave
         ]["ganancia"] += ganancia
 
-    if not resumen_productos:
-        tk.Label(
+    productos_ordenados = sorted(
+        resumen.values(),
+        key=lambda x: x["ganancia"],
+        reverse=True
+    )
+
+    for numero, datos in enumerate(
+        productos_ordenados,
+        start=1
+    ):
+        caja = tk.LabelFrame(
             contenido,
             text=(
-                "Todavía no hay ventas "
-                "con costo y ganancia registrados."
+                f"{numero}. "
+                f"{datos['producto']}"
             ),
-            font=("Arial", 12)
-        ).pack(
-            pady=40
+            font=("Arial", 11, "bold"),
+            padx=20,
+            pady=10
         )
 
-    else:
-        productos_ordenados = sorted(
-            resumen_productos.values(),
-            key=lambda x: x["ganancia"],
-            reverse=True
+        caja.pack(
+            fill="x",
+            padx=5,
+            pady=7
         )
 
-        for numero, datos in enumerate(
-            productos_ordenados,
-            start=1
-        ):
-            codigo = (
-                datos["codigo"]
-                if datos["codigo"]
-                else "SIN CÓDIGO"
+        tk.Label(
+            caja,
+            text=(
+                f"Código: "
+                f"{datos['codigo'] or 'SIN CÓDIGO'}"
             )
+        ).pack(anchor="w")
 
-            caja = tk.LabelFrame(
-                contenido,
-                text=f"{numero}. {datos['producto']}",
-                font=("Arial", 11, "bold"),
-                padx=20,
-                pady=10,
-                width=740
+        tk.Label(
+            caja,
+            text=(
+                f"Unidades vendidas: "
+                f"{datos['cantidad']}"
             )
+        ).pack(anchor="w")
 
-            caja.pack(
-                fill="x",
-                padx=5,
-                pady=7
+        tk.Label(
+            caja,
+            text=(
+                f"Ingresos: "
+                f"${datos['ingresos']:.2f}"
             )
+        ).pack(anchor="w")
 
-            tk.Label(
-                caja,
-                text=f"Código: {codigo}"
-            ).pack(anchor="w")
+        tk.Label(
+            caja,
+            text=(
+                f"Costo de lo vendido: "
+                f"${datos['costos']:.2f}"
+            )
+        ).pack(anchor="w")
 
-            tk.Label(
-                caja,
-                text=(
-                    f"Unidades vendidas: "
-                    f"{datos['cantidad']}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Ingresos: "
-                    f"${datos['ventas']:.2f}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Costo de lo vendido: "
-                    f"${datos['costo']:.2f}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"GANANCIA REAL: "
-                    f"${datos['ganancia']:.2f}"
-                ),
-                font=("Arial", 11, "bold")
-            ).pack(anchor="w")
+        tk.Label(
+            caja,
+            text=(
+                f"GANANCIA REAL: "
+                f"${datos['ganancia']:.2f}"
+            ),
+            font=("Arial", 11, "bold")
+        ).pack(anchor="w")
 
     marco_totales = tk.LabelFrame(
         v,
@@ -2208,7 +2413,7 @@ def abrir_reporte_ganancias():
         marco_totales,
         text=(
             f"Ventas con costo registrado: "
-            f"{ventas_con_ganancia}"
+            f"{ventas_con_costo}"
         )
     ).pack(anchor="w")
 
@@ -2263,14 +2468,14 @@ def abrir_reporte_ganancias():
 
 
 # ==================================================
-# VER VENTAS
+# VENTAS
 # ==================================================
 
 def abrir_ventas():
     v = tk.Toplevel(ventana)
 
     v.title("Ventas")
-    v.geometry("820x680")
+    v.geometry("900x700")
     v.resizable(False, False)
 
     tk.Label(
@@ -2298,12 +2503,23 @@ def abrir_ventas():
 
     tk.Button(
         botones,
+        text="Historial de ventas",
+        width=20,
+        command=abrir_historial_ventas
+    ).grid(
+        row=0,
+        column=1,
+        padx=5
+    )
+
+    tk.Button(
+        botones,
         text="Reporte de ganancias",
         width=20,
         command=abrir_reporte_ganancias
     ).grid(
         row=0,
-        column=1,
+        column=2,
         padx=5
     )
 
@@ -2326,8 +2542,7 @@ def abrir_ventas():
             contenido,
             text=f"Venta {numero}",
             padx=15,
-            pady=8,
-            width=680
+            pady=8
         )
 
         caja.pack(
@@ -2370,54 +2585,6 @@ def abrir_ventas():
             )
         ).pack(anchor="w")
 
-        if "precio_unitario" in venta:
-            precio = convertir_numero(
-                venta.get(
-                    "precio_unitario",
-                    0
-                )
-            )
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Precio unitario: "
-                    f"${precio:.2f}"
-                )
-            ).pack(anchor="w")
-
-        if "costo_unitario" in venta:
-            costo_unitario = convertir_numero(
-                venta.get(
-                    "costo_unitario",
-                    0
-                )
-            )
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Costo unitario: "
-                    f"${costo_unitario:.2f}"
-                )
-            ).pack(anchor="w")
-
-        if "costo_total" in venta:
-            costo_total = convertir_numero(
-                venta.get(
-                    "costo_total",
-                    0
-                )
-            )
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Costo total: "
-                    f"${costo_total:.2f}"
-                )
-            ).pack(anchor="w")
-
         tk.Label(
             caja,
             text=(
@@ -2444,17 +2611,6 @@ def abrir_ventas():
                     f"${ganancia:.2f}"
                 ),
                 font=("Arial", 10, "bold")
-            ).pack(anchor="w")
-
-        fecha = venta.get(
-            "fecha",
-            ""
-        )
-
-        if fecha:
-            tk.Label(
-                caja,
-                text=f"Fecha: {fecha}"
             ).pack(anchor="w")
 
     tk.Label(
@@ -2666,8 +2822,7 @@ def abrir_gastos():
             contenido,
             text=f"Gasto {numero}",
             padx=20,
-            pady=8,
-            width=580
+            pady=8
         )
 
         caja.pack(
@@ -2699,7 +2854,10 @@ def abrir_gastos():
 
     tk.Label(
         v,
-        text=f"TOTAL DE GASTOS: ${total:.2f}",
+        text=(
+            f"TOTAL DE GASTOS: "
+            f"${total:.2f}"
+        ),
         font=("Arial", 13, "bold")
     ).pack(pady=5)
 
@@ -2817,12 +2975,27 @@ def abrir_resumen():
         f"Clientes registrados: {len(clientes)}",
         f"Ventas registradas: {len(ventas)}",
         f"Ingresos por ventas: ${ingresos:.2f}",
-        f"Ganancia real conocida: ${ganancia_real_conocida:.2f}",
-        f"Gastos operativos: ${gastos_totales:.2f}",
+        (
+            "Ganancia real conocida: "
+            f"${ganancia_real_conocida:.2f}"
+        ),
+        (
+            "Gastos operativos: "
+            f"${gastos_totales:.2f}"
+        ),
         "",
-        f"Capital en inventario: ${capital:.2f}",
-        f"Valor del inventario: ${valor_venta:.2f}",
-        f"Ganancia potencial: ${ganancia_potencial:.2f}",
+        (
+            "Capital en inventario: "
+            f"${capital:.2f}"
+        ),
+        (
+            "Valor del inventario: "
+            f"${valor_venta:.2f}"
+        ),
+        (
+            "Ganancia potencial: "
+            f"${ganancia_potencial:.2f}"
+        ),
         "",
         f"Flujo de caja: ${flujo:.2f}",
         f"Estado: {estado}"
@@ -2901,7 +3074,10 @@ def abrir_diagnostico():
             f"Flujo de caja: "
             f"${resultado['flujo_neto']:.2f}"
         )
-    ).pack(anchor="w", pady=3)
+    ).pack(
+        anchor="w",
+        pady=3
+    )
 
     tk.Label(
         financiero,
@@ -2910,7 +3086,10 @@ def abrir_diagnostico():
             f"{resultado['estado_flujo']}"
         ),
         font=("Arial", 11, "bold")
-    ).pack(anchor="w", pady=3)
+    ).pack(
+        anchor="w",
+        pady=3
+    )
 
     tk.Label(
         financiero,
@@ -2918,7 +3097,10 @@ def abrir_diagnostico():
             "Ganancia potencial: "
             f"${resultado['ganancia_potencial']:.2f}"
         )
-    ).pack(anchor="w", pady=3)
+    ).pack(
+        anchor="w",
+        pady=3
+    )
 
     tk.Label(
         financiero,
@@ -2926,7 +3108,10 @@ def abrir_diagnostico():
             "Gastos sobre ventas: "
             f"{resultado['porcentaje_gastos']:.2f}%"
         )
-    ).pack(anchor="w", pady=3)
+    ).pack(
+        anchor="w",
+        pady=3
+    )
 
     analisis = tk.LabelFrame(
         v,
