@@ -2011,7 +2011,7 @@ def abrir_historial_ventas():
 
     tk.Label(
         marco_busqueda,
-        text="Buscar cliente, código o producto:",
+        text="Buscar cliente, código, producto o fecha:",
         font=("Arial", 11, "bold")
     ).pack(
         side="left",
@@ -2076,12 +2076,18 @@ def abrir_historial_ventas():
                 venta.get("producto", "")
             )
 
+            fecha = str(
+                venta.get("fecha", "")
+            )
+
             texto = (
                 cliente.lower()
                 + " "
                 + codigo.lower()
                 + " "
                 + producto.lower()
+                + " "
+                + fecha.lower()
             )
 
             if (
