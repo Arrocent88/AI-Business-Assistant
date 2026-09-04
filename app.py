@@ -10,6 +10,7 @@ from gastos import gastos
 from diagnostico import calcular_diagnostico
 from cuentas import cuentas_por_cobrar, guardar_cuentas
 from cuentas_ui import abrir_cuentas_por_cobrar
+from cliente_resumen_ui import abrir_resumen_cliente
 
 
 # ==================================================
@@ -173,12 +174,35 @@ def abrir_clientes():
         font=("Arial", 18, "bold")
     ).pack(pady=20)
 
+    marco_botones = tk.Frame(v)
+
+    marco_botones.pack(
+        pady=(0, 15)
+    )
+
     tk.Button(
-        v,
+        marco_botones,
         text="+ Registrar cliente",
         width=20,
         command=abrir_registro_cliente
-    ).pack(pady=(0, 15))
+    ).grid(
+        row=0,
+        column=0,
+        padx=5
+    )
+
+    tk.Button(
+        marco_botones,
+        text="Resumen por cliente",
+        width=20,
+        command=lambda: abrir_resumen_cliente(
+            v
+        )
+    ).grid(
+        row=0,
+        column=1,
+        padx=5
+    )
 
     for numero, cliente in enumerate(
         clientes,
@@ -1463,11 +1487,80 @@ def abrir_registro_venta():
     v = tk.Toplevel(ventana)
 
     v.title("Registrar venta")
-    v.geometry("650x930")
+    v.geometry("650x760")
     v.resizable(False, False)
 
+    marco_scroll = tk.Frame(v)
+
+    marco_scroll.pack(
+        fill="both",
+        expand=True
+    )
+
+    canvas_venta = tk.Canvas(
+        marco_scroll,
+        highlightthickness=0
+    )
+
+    scrollbar_venta = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas_venta.yview
+    )
+
+    contenido_venta = tk.Frame(
+        canvas_venta
+    )
+
+    contenido_venta.bind(
+        "<Configure>",
+        lambda e: canvas_venta.configure(
+            scrollregion=canvas_venta.bbox("all")
+        )
+    )
+
+    ventana_canvas = canvas_venta.create_window(
+        (0, 0),
+        window=contenido_venta,
+        anchor="nw"
+    )
+
+    canvas_venta.bind(
+        "<Configure>",
+        lambda e: canvas_venta.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas_venta.configure(
+        yscrollcommand=scrollbar_venta.set
+    )
+
+    canvas_venta.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar_venta.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas_venta.yview_scroll(
+            int(-1 * (event.delta / 120)),
+            "units"
+        )
+
+    canvas_venta.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
+
     tk.Label(
-        v,
+        contenido_venta,
         text="REGISTRAR VENTA",
         font=("Arial", 18, "bold")
     ).pack(
@@ -1475,12 +1568,12 @@ def abrir_registro_venta():
     )
 
     tk.Label(
-        v,
+        contenido_venta,
         text="Cliente:"
     ).pack()
 
     combo_cliente = ttk.Combobox(
-        v,
+        contenido_venta,
         values=[
             c.get("nombre", "")
             for c in clientes
@@ -1494,14 +1587,14 @@ def abrir_registro_venta():
     )
 
     tk.Label(
-        v,
+        contenido_venta,
         text="Escribe código o nombre para filtrar la lista:"
     ).pack()
 
     variable_busqueda = tk.StringVar()
 
     entrada_busqueda = tk.Entry(
-        v,
+        contenido_venta,
         textvariable=variable_busqueda,
         width=40,
         font=("Arial", 11)
@@ -1512,12 +1605,12 @@ def abrir_registro_venta():
     )
 
     tk.Label(
-        v,
+        contenido_venta,
         text="Lista de productos (código - nombre):"
     ).pack()
 
     lista_productos = tk.Listbox(
-        v,
+        contenido_venta,
         width=50,
         height=4,
         font=("Arial", 10)
@@ -1528,12 +1621,12 @@ def abrir_registro_venta():
     )
 
     tk.Label(
-        v,
+        contenido_venta,
         text="Producto seleccionado:"
     ).pack()
 
     combo_producto = ttk.Combobox(
-        v,
+        contenido_venta,
         state="readonly",
         width=45
     )
@@ -1543,7 +1636,7 @@ def abrir_registro_venta():
     )
 
     etiqueta_info = tk.Label(
-        v,
+        contenido_venta,
         text="",
         font=("Arial", 11, "bold")
     )
@@ -1553,14 +1646,14 @@ def abrir_registro_venta():
     )
 
     tk.Label(
-        v,
+        contenido_venta,
         text="Cantidad:"
     ).pack()
 
     variable_cantidad = tk.StringVar()
 
     entrada_cantidad = tk.Entry(
-        v,
+        contenido_venta,
         textvariable=variable_cantidad,
         width=15,
         font=("Arial", 11)
@@ -1571,7 +1664,7 @@ def abrir_registro_venta():
     )
 
     tk.Label(
-        v,
+        contenido_venta,
         text="Tipo de venta:"
     ).pack()
 
@@ -1580,7 +1673,7 @@ def abrir_registro_venta():
     )
 
     combo_tipo_venta = ttk.Combobox(
-        v,
+        contenido_venta,
         textvariable=variable_tipo_venta,
         values=[
             "Pagada",
@@ -1595,12 +1688,12 @@ def abrir_registro_venta():
     )
 
     tk.Label(
-        v,
+        contenido_venta,
         text="Fecha de vencimiento si es a crédito (YYYY-MM-DD):"
     ).pack()
 
     entrada_vencimiento = tk.Entry(
-        v,
+        contenido_venta,
         width=18,
         font=("Arial", 11)
     )
@@ -1610,7 +1703,7 @@ def abrir_registro_venta():
     )
 
     marco_calculo = tk.LabelFrame(
-        v,
+        contenido_venta,
         text="Cálculo de la venta",
         font=("Arial", 11, "bold"),
         padx=25,
@@ -2147,15 +2240,31 @@ def abrir_registro_venta():
             )
         )
 
+        canvas_venta.unbind_all(
+            "<MouseWheel>"
+        )
+
         v.destroy()
 
     tk.Button(
-        v,
+        contenido_venta,
         text="Guardar venta",
         width=18,
         command=guardar_venta
     ).pack(
         pady=15
+    )
+
+    def cerrar_ventana_venta():
+        canvas_venta.unbind_all(
+            "<MouseWheel>"
+        )
+
+        v.destroy()
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar_ventana_venta
     )
 
     entrada_busqueda.focus()
