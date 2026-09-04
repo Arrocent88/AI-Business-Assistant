@@ -283,7 +283,138 @@ def abrir_cuentas_por_cobrar(ventana_padre):
         padx=5
     )
 
+    marco_resumen = tk.LabelFrame(
+        v,
+        text="Resumen de cuentas por cobrar",
+        font=("Arial", 11, "bold"),
+        padx=12,
+        pady=8
+    )
+
+    marco_resumen.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 8)
+    )
+
+    etiqueta_pendiente = tk.Label(
+        marco_resumen,
+        font=("Arial", 10, "bold")
+    )
+    etiqueta_pendiente.grid(
+        row=0,
+        column=0,
+        padx=18,
+        pady=4
+    )
+
+    etiqueta_vencido = tk.Label(
+        marco_resumen,
+        font=("Arial", 10, "bold")
+    )
+    etiqueta_vencido.grid(
+        row=0,
+        column=1,
+        padx=18,
+        pady=4
+    )
+
+    etiqueta_pronto = tk.Label(
+        marco_resumen,
+        font=("Arial", 10, "bold")
+    )
+    etiqueta_pronto.grid(
+        row=0,
+        column=2,
+        padx=18,
+        pady=4
+    )
+
+    etiqueta_clientes = tk.Label(
+        marco_resumen,
+        font=("Arial", 10, "bold")
+    )
+    etiqueta_clientes.grid(
+        row=0,
+        column=3,
+        padx=18,
+        pady=4
+    )
+
+    def actualizar_resumen():
+        total_pendiente_resumen = 0
+        total_vencido = 0
+        total_pronto = 0
+        clientes_deudores = set()
+
+        for cuenta in cuentas_por_cobrar:
+            saldo = convertir_numero(
+                cuenta.get(
+                    "saldo_pendiente",
+                    0
+                )
+            )
+
+            if saldo <= 0:
+                continue
+
+            total_pendiente_resumen += saldo
+
+            cliente = str(
+                cuenta.get(
+                    "cliente",
+                    ""
+                )
+            ).strip()
+
+            if cliente:
+                clientes_deudores.add(
+                    cliente.lower()
+                )
+
+            alerta = calcular_alerta_vencimiento(
+                cuenta
+            )
+
+            if alerta.startswith("VENCIDA"):
+                total_vencido += saldo
+            elif (
+                alerta == "VENCE HOY"
+                or alerta.startswith("VENCE PRONTO")
+            ):
+                total_pronto += saldo
+
+        etiqueta_pendiente.config(
+            text=(
+                "Total pendiente\n"
+                f"${total_pendiente_resumen:.2f}"
+            )
+        )
+
+        etiqueta_vencido.config(
+            text=(
+                "Total vencido\n"
+                f"${total_vencido:.2f}"
+            )
+        )
+
+        etiqueta_pronto.config(
+            text=(
+                "Vence pronto\n"
+                f"${total_pronto:.2f}"
+            )
+        )
+
+        etiqueta_clientes.config(
+            text=(
+                "Clientes con deuda\n"
+                f"{len(clientes_deudores)}"
+            )
+        )
+
     def actualizar_lista():
+        actualizar_resumen()
+
         for widget in contenido.winfo_children():
             widget.destroy()
 
