@@ -1,0 +1,15 @@
+[
+    {
+        "id": "20260904141551790400",
+        "cliente": "Maria Lopez",
+        "codigo_producto": "ACE-001",
+        "producto": "Aceite 15W/40",
+        "cantidad": 1,
+        "total": 25.0,
+        "monto_pagado": 25.0,
+        "saldo_pendiente": 0,
+        "fecha_venta": "2026-09-04",
+        "fecha_vencimiento": "2026-09-15",
+        "estado": "Pagada"
+    }
+]

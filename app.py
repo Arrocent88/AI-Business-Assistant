@@ -8,6 +8,8 @@ from inventario import inventario, reposiciones
 from ventas import ventas
 from gastos import gastos
 from diagnostico import calcular_diagnostico
+from cuentas import cuentas_por_cobrar, guardar_cuentas
+from cuentas_ui import abrir_cuentas_por_cobrar
 
 
 # ==================================================
@@ -1461,7 +1463,7 @@ def abrir_registro_venta():
     v = tk.Toplevel(ventana)
 
     v.title("Registrar venta")
-    v.geometry("650x680")
+    v.geometry("650x930")
     v.resizable(False, False)
 
     tk.Label(
@@ -1493,7 +1495,7 @@ def abrir_registro_venta():
 
     tk.Label(
         v,
-        text="Buscar producto por código o nombre:"
+        text="Escribe código o nombre para filtrar la lista:"
     ).pack()
 
     variable_busqueda = tk.StringVar()
@@ -1511,7 +1513,23 @@ def abrir_registro_venta():
 
     tk.Label(
         v,
-        text="Producto encontrado:"
+        text="Lista de productos (código - nombre):"
+    ).pack()
+
+    lista_productos = tk.Listbox(
+        v,
+        width=50,
+        height=4,
+        font=("Arial", 10)
+    )
+
+    lista_productos.pack(
+        pady=(5, 10)
+    )
+
+    tk.Label(
+        v,
+        text="Producto seleccionado:"
     ).pack()
 
     combo_producto = ttk.Combobox(
@@ -1549,6 +1567,45 @@ def abrir_registro_venta():
     )
 
     entrada_cantidad.pack(
+        pady=(5, 15)
+    )
+
+    tk.Label(
+        v,
+        text="Tipo de venta:"
+    ).pack()
+
+    variable_tipo_venta = tk.StringVar(
+        value="Pagada"
+    )
+
+    combo_tipo_venta = ttk.Combobox(
+        v,
+        textvariable=variable_tipo_venta,
+        values=[
+            "Pagada",
+            "A crédito"
+        ],
+        state="readonly",
+        width=20
+    )
+
+    combo_tipo_venta.pack(
+        pady=(5, 12)
+    )
+
+    tk.Label(
+        v,
+        text="Fecha de vencimiento si es a crédito (YYYY-MM-DD):"
+    ).pack()
+
+    entrada_vencimiento = tk.Entry(
+        v,
+        width=18,
+        font=("Arial", 11)
+    )
+
+    entrada_vencimiento.pack(
         pady=(5, 15)
     )
 
@@ -1809,6 +1866,17 @@ def abrir_registro_venta():
 
         combo_producto.set("")
 
+        lista_productos.delete(
+            0,
+            tk.END
+        )
+
+        for opcion in opciones:
+            lista_productos.insert(
+                tk.END,
+                opcion
+            )
+
         etiqueta_info.config(
             text=""
         )
@@ -1819,10 +1887,16 @@ def abrir_registro_venta():
             productos_filtrados
         ) == 1:
             combo_producto.current(0)
+            lista_productos.selection_set(0)
             mostrar_info_producto()
 
     variable_busqueda.trace_add(
         "write",
+        actualizar_productos
+    )
+
+    entrada_busqueda.bind(
+        "<KeyRelease>",
         actualizar_productos
     )
 
@@ -1834,6 +1908,25 @@ def abrir_registro_venta():
     combo_producto.bind(
         "<<ComboboxSelected>>",
         mostrar_info_producto
+    )
+
+    def seleccionar_desde_lista(event=None):
+        seleccion = lista_productos.curselection()
+
+        if not seleccion:
+            return
+
+        indice = seleccion[0]
+
+        combo_producto.current(
+            indice
+        )
+
+        mostrar_info_producto()
+
+    lista_productos.bind(
+        "<<ListboxSelect>>",
+        seleccionar_desde_lista
     )
 
     actualizar_productos()
@@ -1892,6 +1985,42 @@ def abrir_registro_venta():
             indice_cliente
         ]
 
+        tipo_venta = (
+            variable_tipo_venta.get()
+            .strip()
+        )
+
+        fecha_vencimiento = (
+            entrada_vencimiento.get()
+            .strip()
+        )
+
+        if tipo_venta == "A crédito":
+            if not fecha_vencimiento:
+                messagebox.showwarning(
+                    "Fecha requerida",
+                    (
+                        "Escribe la fecha de vencimiento "
+                        "para la venta a crédito."
+                    )
+                )
+                return
+
+            try:
+                datetime.strptime(
+                    fecha_vencimiento,
+                    "%Y-%m-%d"
+                )
+            except ValueError:
+                messagebox.showwarning(
+                    "Fecha incorrecta",
+                    (
+                        "Usa el formato YYYY-MM-DD.\n"
+                        "Ejemplo: 2026-09-30"
+                    )
+                )
+                return
+
         precio = convertir_numero(
             producto.get("precio", 0)
         )
@@ -1933,6 +2062,12 @@ def abrir_registro_venta():
             "costo_total": costo_total,
             "monto": total_venta,
             "ganancia": ganancia_real,
+            "tipo_pago": tipo_venta,
+            "estado_pago": (
+                "Pagada"
+                if tipo_venta == "Pagada"
+                else "Pendiente"
+            ),
             "fecha": datetime.now().strftime(
                 "%Y-%m-%d"
             )
@@ -1952,6 +2087,42 @@ def abrir_registro_venta():
             inventario
         )
 
+        if tipo_venta == "A crédito":
+            cuenta = {
+                "id": datetime.now().strftime(
+                    "%Y%m%d%H%M%S%f"
+                ),
+                "cliente": cliente.get(
+                    "nombre",
+                    ""
+                ),
+                "codigo_producto": producto.get(
+                    "codigo",
+                    ""
+                ),
+                "producto": producto.get(
+                    "producto",
+                    ""
+                ),
+                "cantidad": cantidad,
+                "total": total_venta,
+                "monto_pagado": 0,
+                "saldo_pendiente": total_venta,
+                "fecha_venta": datetime.now().strftime(
+                    "%Y-%m-%d"
+                ),
+                "fecha_vencimiento": fecha_vencimiento,
+                "estado": "Pendiente"
+            }
+
+            cuentas_por_cobrar.append(
+                cuenta
+            )
+
+            guardar_cuentas(
+                cuentas_por_cobrar
+            )
+
         messagebox.showinfo(
             "Venta registrada",
             (
@@ -1966,7 +2137,13 @@ def abrir_registro_venta():
                 f"Total vendido: "
                 f"${total_venta:.2f}\n"
                 f"Ganancia real: "
-                f"${ganancia_real:.2f}"
+                f"${ganancia_real:.2f}\n"
+                f"Tipo de venta: {tipo_venta}"
+                + (
+                    f"\nVence: {fecha_vencimiento}"
+                    if tipo_venta == "A crédito"
+                    else ""
+                )
             )
         )
 
@@ -3186,7 +3363,7 @@ ventana.title(
 )
 
 ventana.geometry(
-    "700x520"
+    "700x620"
 )
 
 ventana.resizable(
@@ -3232,6 +3409,12 @@ botones = [
     (
         "Gastos",
         abrir_gastos
+    ),
+    (
+        "Cuentas por cobrar",
+        lambda: abrir_cuentas_por_cobrar(
+            ventana
+        )
     ),
     (
         "Resumen del negocio",
