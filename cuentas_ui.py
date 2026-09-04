@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, simpledialog
+from datetime import datetime
 
 from cuentas import (
     cuentas_por_cobrar,
@@ -14,6 +15,53 @@ def convertir_numero(valor):
         .replace(",", "")
         .strip()
     )
+
+
+def calcular_alerta_vencimiento(cuenta):
+    saldo = convertir_numero(
+        cuenta.get(
+            "saldo_pendiente",
+            0
+        )
+    )
+
+    if saldo <= 0:
+        return "Pagada"
+
+    fecha_texto = str(
+        cuenta.get(
+            "fecha_vencimiento",
+            ""
+        )
+    ).strip()
+
+    if not fecha_texto:
+        return "Sin fecha de vencimiento"
+
+    try:
+        fecha_vencimiento = datetime.strptime(
+            fecha_texto,
+            "%Y-%m-%d"
+        ).date()
+    except ValueError:
+        return "Fecha de vencimiento inválida"
+
+    hoy = datetime.now().date()
+
+    dias = (
+        fecha_vencimiento - hoy
+    ).days
+
+    if dias < 0:
+        return f"VENCIDA hace {abs(dias)} día(s)"
+
+    if dias == 0:
+        return "VENCE HOY"
+
+    if dias <= 7:
+        return f"VENCE PRONTO - faltan {dias} día(s)"
+
+    return f"AL DÍA - faltan {dias} día(s)"
 
 
 def abrir_cuentas_por_cobrar(ventana_padre):
@@ -169,6 +217,19 @@ def abrir_cuentas_por_cobrar(ventana_padre):
             cuenta["estado"] = "Pagada"
         else:
             cuenta["estado"] = "Pendiente"
+
+        if "pagos" not in cuenta:
+            cuenta["pagos"] = []
+
+        cuenta["pagos"].append({
+            "fecha": datetime.now().strftime(
+                "%Y-%m-%d"
+            ),
+            "monto": round(
+                monto,
+                2
+            )
+        })
 
         guardar_cuentas(
             cuentas_por_cobrar
@@ -355,6 +416,61 @@ def abrir_cuentas_por_cobrar(ventana_padre):
                     f"{cuenta.get('estado', 'Pendiente')}"
                 )
             ).pack(anchor="w")
+
+            alerta = calcular_alerta_vencimiento(
+                cuenta
+            )
+
+            tk.Label(
+                caja,
+                text=f"Alerta: {alerta}",
+                font=("Arial", 10, "bold")
+            ).pack(anchor="w")
+
+            pagos = cuenta.get(
+                "pagos",
+                []
+            )
+
+            tk.Label(
+                caja,
+                text="Historial de pagos:",
+                font=("Arial", 10, "bold")
+            ).pack(
+                anchor="w",
+                pady=(10, 3)
+            )
+
+            if pagos:
+                for numero_pago, pago in enumerate(
+                    pagos,
+                    start=1
+                ):
+                    monto_pago = convertir_numero(
+                        pago.get(
+                            "monto",
+                            0
+                        )
+                    )
+
+                    fecha_pago = pago.get(
+                        "fecha",
+                        "Sin fecha"
+                    )
+
+                    tk.Label(
+                        caja,
+                        text=(
+                            f"{numero_pago}. "
+                            f"{fecha_pago} - "
+                            f"${monto_pago:.2f}"
+                        )
+                    ).pack(anchor="w")
+            else:
+                tk.Label(
+                    caja,
+                    text="Sin pagos registrados."
+                ).pack(anchor="w")
 
             if modo == "Pendientes":
                 tk.Button(
