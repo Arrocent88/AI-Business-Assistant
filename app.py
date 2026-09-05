@@ -11,6 +11,7 @@ from diagnostico import calcular_diagnostico
 from cuentas import cuentas_por_cobrar, guardar_cuentas
 from cuentas_ui import abrir_cuentas_por_cobrar
 from cliente_resumen_ui import abrir_resumen_cliente
+from dashboard import calcular_dashboard
 
 
 # ==================================================
@@ -3472,7 +3473,7 @@ ventana.title(
 )
 
 ventana.geometry(
-    "700x620"
+    "820x760"
 )
 
 ventana.resizable(
@@ -3485,7 +3486,7 @@ tk.Label(
     text="AI BUSINESS ASSISTANT",
     font=("Arial", 22, "bold")
 ).pack(
-    pady=(30, 5)
+    pady=(20, 3)
 )
 
 tk.Label(
@@ -3493,8 +3494,160 @@ tk.Label(
     text="Panel de administración del negocio",
     font=("Arial", 12)
 ).pack(
-    pady=(0, 30)
+    pady=(0, 15)
 )
+
+
+# ==================================================
+# DASHBOARD PRINCIPAL
+# ==================================================
+
+marco_dashboard = tk.LabelFrame(
+    ventana,
+    text="Dashboard del negocio",
+    font=("Arial", 12, "bold"),
+    padx=15,
+    pady=12
+)
+
+marco_dashboard.pack(
+    fill="x",
+    padx=35,
+    pady=(0, 15)
+)
+
+etiquetas_dashboard = {}
+
+
+def crear_indicador_dashboard(
+    fila,
+    columna,
+    titulo,
+    clave
+):
+    marco = tk.Frame(
+        marco_dashboard,
+        padx=12,
+        pady=8
+    )
+
+    marco.grid(
+        row=fila,
+        column=columna,
+        padx=8,
+        pady=5,
+        sticky="nsew"
+    )
+
+    tk.Label(
+        marco,
+        text=titulo,
+        font=("Arial", 10)
+    ).pack()
+
+    etiqueta = tk.Label(
+        marco,
+        text="$0.00",
+        font=("Arial", 14, "bold")
+    )
+
+    etiqueta.pack(
+        pady=(3, 0)
+    )
+
+    etiquetas_dashboard[
+        clave
+    ] = etiqueta
+
+
+crear_indicador_dashboard(
+    0, 0,
+    "Ventas totales",
+    "ventas_totales"
+)
+
+crear_indicador_dashboard(
+    0, 1,
+    "Ganancia conocida",
+    "ganancia_conocida"
+)
+
+crear_indicador_dashboard(
+    0, 2,
+    "Gastos",
+    "gastos_totales"
+)
+
+crear_indicador_dashboard(
+    1, 0,
+    "Por cobrar",
+    "total_por_cobrar"
+)
+
+crear_indicador_dashboard(
+    1, 1,
+    "Capital en inventario",
+    "capital_inventario"
+)
+
+crear_indicador_dashboard(
+    1, 2,
+    "Flujo de caja",
+    "flujo_caja"
+)
+
+for columna in range(3):
+    marco_dashboard.grid_columnconfigure(
+        columna,
+        weight=1
+    )
+
+
+def actualizar_dashboard():
+    try:
+        datos = calcular_dashboard()
+
+        for clave, etiqueta in (
+            etiquetas_dashboard.items()
+        ):
+            valor = convertir_numero(
+                datos.get(
+                    clave,
+                    0
+                )
+            )
+
+            etiqueta.config(
+                text=f"${valor:.2f}"
+            )
+
+    except Exception as error:
+        messagebox.showerror(
+            "Dashboard",
+            (
+                "No se pudo actualizar "
+                "el dashboard.\n\n"
+                f"{error}"
+            )
+        )
+
+
+tk.Button(
+    marco_dashboard,
+    text="Actualizar dashboard",
+    width=20,
+    command=actualizar_dashboard
+).grid(
+    row=2,
+    column=0,
+    columnspan=3,
+    pady=(10, 0)
+)
+
+
+# ==================================================
+# BOTONES PRINCIPALES
+# ==================================================
 
 contenedor = tk.Frame(
     ventana
@@ -3544,13 +3697,13 @@ for indice, (
         contenedor,
         text=texto,
         width=20,
-        height=3,
+        height=2,
         command=comando
     ).grid(
         row=indice // 2,
         column=indice % 2,
         padx=10,
-        pady=10
+        pady=7
     )
 
 tk.Button(
@@ -3559,7 +3712,9 @@ tk.Button(
     width=15,
     command=ventana.destroy
 ).pack(
-    pady=30
+    pady=18
 )
+
+actualizar_dashboard()
 
 ventana.mainloop()
