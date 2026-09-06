@@ -7,14 +7,22 @@ from cuentas import (
     guardar_cuentas
 )
 
+from idiomas import (
+    t,
+    obtener_idioma
+)
+
 
 def convertir_numero(valor):
-    return float(
-        str(valor)
-        .replace("$", "")
-        .replace(",", "")
-        .strip()
-    )
+    try:
+        return float(
+            str(valor)
+            .replace("$", "")
+            .replace(",", "")
+            .strip()
+        )
+    except (ValueError, TypeError):
+        return 0.0
 
 
 def calcular_alerta_vencimiento(cuenta):
@@ -26,7 +34,11 @@ def calcular_alerta_vencimiento(cuenta):
     )
 
     if saldo <= 0:
-        return "Pagada"
+        return (
+            "Paid"
+            if obtener_idioma() == "en"
+            else "Pagada"
+        )
 
     fecha_texto = str(
         cuenta.get(
@@ -36,7 +48,11 @@ def calcular_alerta_vencimiento(cuenta):
     ).strip()
 
     if not fecha_texto:
-        return "Sin fecha de vencimiento"
+        return (
+            "No due date"
+            if obtener_idioma() == "en"
+            else "Sin fecha de vencimiento"
+        )
 
     try:
         fecha_vencimiento = datetime.strptime(
@@ -44,69 +60,275 @@ def calcular_alerta_vencimiento(cuenta):
             "%Y-%m-%d"
         ).date()
     except ValueError:
-        return "Fecha de vencimiento inválida"
+        return (
+            "Invalid due date"
+            if obtener_idioma() == "en"
+            else "Fecha de vencimiento inválida"
+        )
 
     hoy = datetime.now().date()
-
     dias = (
         fecha_vencimiento - hoy
     ).days
 
     if dias < 0:
-        return f"VENCIDA hace {abs(dias)} día(s)"
+        return (
+            f"OVERDUE by {abs(dias)} day(s)"
+            if obtener_idioma() == "en"
+            else f"VENCIDA hace {abs(dias)} día(s)"
+        )
 
     if dias == 0:
-        return "VENCE HOY"
+        return (
+            "DUE TODAY"
+            if obtener_idioma() == "en"
+            else "VENCE HOY"
+        )
 
     if dias <= 7:
-        return f"VENCE PRONTO - faltan {dias} día(s)"
+        return (
+            f"DUE SOON - {dias} day(s)"
+            if obtener_idioma() == "en"
+            else f"VENCE PRONTO - faltan {dias} día(s)"
+        )
 
-    return f"AL DÍA - faltan {dias} día(s)"
+    return (
+        f"CURRENT - {dias} day(s)"
+        if obtener_idioma() == "en"
+        else f"AL DÍA - faltan {dias} día(s)"
+    )
 
 
 def abrir_cuentas_por_cobrar(ventana_padre):
-    v = tk.Toplevel(ventana_padre)
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    VERDE = "#22C55E"
+    AMARILLO = "#F59E0B"
+    ROJO = "#EF4444"
+    CYAN = "#06B6D4"
 
-    v.title("Cuentas por cobrar")
-    v.geometry("900x720")
-    v.resizable(False, False)
-
-    tk.Label(
-        v,
-        text="CUENTAS POR COBRAR",
-        font=("Arial", 18, "bold")
-    ).pack(
-        pady=(20, 10)
+    v = tk.Toplevel(
+        ventana_padre
     )
+
+    v.title(
+        "AI Business Assistant - Accounts Receivable"
+    )
+
+    v.geometry(
+        "1100x800"
+    )
+
+    v.minsize(
+        880,
+        650
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(bg=FONDO)
 
     modo_actual = tk.StringVar(
         value="Pendientes"
     )
 
-    marco_botones = tk.Frame(v)
-
-    marco_botones.pack(
-        pady=(0, 10)
+    encabezado = tk.Frame(
+        v,
+        bg=FONDO
     )
 
-    marco = tk.Frame(v)
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 14)
+    )
 
-    marco.pack(
+    tk.Label(
+        encabezado,
+        text=t("receivables_management"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(anchor="w")
+
+    tk.Label(
+        encabezado,
+        text=t("receivables_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    filtros = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    filtros.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    panel_kpis = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    panel_kpis.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    etiquetas_kpi = {}
+
+    def crear_kpi(
+        columna,
+        titulo,
+        clave,
+        color
+    ):
+        tarjeta = tk.Frame(
+            panel_kpis,
+            bg=PANEL,
+            highlightbackground=BORDE,
+            highlightthickness=1,
+            height=95
+        )
+
+        tarjeta.grid(
+            row=0,
+            column=columna,
+            padx=5,
+            sticky="nsew"
+        )
+
+        tarjeta.grid_propagate(False)
+        panel_kpis.grid_columnconfigure(
+            columna,
+            weight=1
+        )
+
+        tk.Frame(
+            tarjeta,
+            bg=color,
+            width=5
+        ).pack(
+            side="left",
+            fill="y"
+        )
+
+        cuerpo = tk.Frame(
+            tarjeta,
+            bg=PANEL
+        )
+
+        cuerpo.pack(
+            fill="both",
+            expand=True,
+            padx=14,
+            pady=12
+        )
+
+        tk.Label(
+            cuerpo,
+            text=titulo,
+            font=("Segoe UI", 8, "bold"),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO
+        ).pack(anchor="w")
+
+        valor = tk.Label(
+            cuerpo,
+            text="$0.00",
+            font=("Segoe UI", 16, "bold"),
+            bg=PANEL,
+            fg=TEXTO
+        )
+
+        valor.pack(
+            anchor="w",
+            pady=(6, 0)
+        )
+
+        etiquetas_kpi[
+            clave
+        ] = valor
+
+    crear_kpi(
+        0,
+        t("total_pending"),
+        "pendiente",
+        AMARILLO
+    )
+
+    crear_kpi(
+        1,
+        t("total_overdue"),
+        "vencido",
+        ROJO
+    )
+
+    crear_kpi(
+        2,
+        t("due_soon"),
+        "pronto",
+        CYAN
+    )
+
+    crear_kpi(
+        3,
+        t("clients_with_debt"),
+        "clientes",
+        AZUL
+    )
+
+    marco_scroll = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    marco_scroll.pack(
         fill="both",
         expand=True,
-        padx=25,
-        pady=5
+        padx=30,
+        pady=(0, 14)
     )
 
-    canvas = tk.Canvas(marco)
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
+    )
 
     scrollbar = tk.Scrollbar(
-        marco,
+        marco_scroll,
         orient="vertical",
         command=canvas.yview
     )
 
-    contenido = tk.Frame(canvas)
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
 
     contenido.bind(
         "<Configure>",
@@ -115,10 +337,12 @@ def abrir_cuentas_por_cobrar(ventana_padre):
         )
     )
 
-    canvas.create_window(
-        (0, 0),
-        window=contenido,
-        anchor="nw"
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
     )
 
     canvas.configure(
@@ -136,14 +360,15 @@ def abrir_cuentas_por_cobrar(ventana_padre):
         fill="y"
     )
 
-    etiqueta_total = tk.Label(
-        v,
-        text="",
-        font=("Arial", 12, "bold")
-    )
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(-1 * (event.delta / 120)),
+            "units"
+        )
 
-    etiqueta_total.pack(
-        pady=10
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
     )
 
     def registrar_pago(cuenta):
@@ -156,17 +381,28 @@ def abrir_cuentas_por_cobrar(ventana_padre):
 
         if saldo_actual <= 0:
             messagebox.showinfo(
-                "Cuenta pagada",
-                "Esta cuenta ya está completamente pagada."
+                "Paid"
+                if obtener_idioma() == "en"
+                else "Cuenta pagada",
+                "This account is already fully paid."
+                if obtener_idioma() == "en"
+                else "Esta cuenta ya está completamente pagada."
             )
             return
 
         monto = simpledialog.askfloat(
-            "Registrar pago",
+            t("register_payment"),
             (
-                f"Cliente: {cuenta.get('cliente', '')}\n"
-                f"Saldo pendiente: ${saldo_actual:.2f}\n\n"
-                "Escribe el monto recibido:"
+                f"{t('clientes')}: "
+                f"{cuenta.get('cliente', '')}\n"
+                f"{t('balance_due')}: "
+                f"${saldo_actual:.2f}\n\n"
+                +
+                (
+                    "Enter payment amount:"
+                    if obtener_idioma() == "en"
+                    else "Escribe el monto recibido:"
+                )
             ),
             parent=v,
             minvalue=0.01
@@ -177,11 +413,12 @@ def abrir_cuentas_por_cobrar(ventana_padre):
 
         if monto > saldo_actual:
             messagebox.showwarning(
-                "Monto incorrecto",
-                (
-                    "El pago no puede ser mayor "
-                    "que el saldo pendiente."
-                )
+                "Invalid amount"
+                if obtener_idioma() == "en"
+                else "Monto incorrecto",
+                "Payment cannot exceed the outstanding balance."
+                if obtener_idioma() == "en"
+                else "El pago no puede ser mayor que el saldo pendiente."
             )
             return
 
@@ -203,25 +440,36 @@ def abrir_cuentas_por_cobrar(ventana_padre):
         if nuevo_saldo < 0.01:
             nuevo_saldo = 0
 
-        cuenta["monto_pagado"] = round(
+        cuenta[
+            "monto_pagado"
+        ] = round(
             nuevo_pagado,
             2
         )
 
-        cuenta["saldo_pendiente"] = round(
+        cuenta[
+            "saldo_pendiente"
+        ] = round(
             nuevo_saldo,
             2
         )
 
-        if nuevo_saldo == 0:
-            cuenta["estado"] = "Pagada"
-        else:
-            cuenta["estado"] = "Pendiente"
+        cuenta[
+            "estado"
+        ] = (
+            "Pagada"
+            if nuevo_saldo == 0
+            else "Pendiente"
+        )
 
         if "pagos" not in cuenta:
-            cuenta["pagos"] = []
+            cuenta[
+                "pagos"
+            ] = []
 
-        cuenta["pagos"].append({
+        cuenta[
+            "pagos"
+        ].append({
             "fecha": datetime.now().strftime(
                 "%Y-%m-%d"
             ),
@@ -236,116 +484,25 @@ def abrir_cuentas_por_cobrar(ventana_padre):
         )
 
         messagebox.showinfo(
-            "Pago registrado",
+            "Payment registered"
+            if obtener_idioma() == "en"
+            else "Pago registrado",
             (
-                "Pago registrado correctamente.\n\n"
-                f"Monto recibido: ${monto:.2f}\n"
-                f"Total pagado: ${nuevo_pagado:.2f}\n"
-                f"Saldo pendiente: ${nuevo_saldo:.2f}"
+                "Payment registered successfully."
+                if obtener_idioma() == "en"
+                else "Pago registrado correctamente."
             )
         )
 
         actualizar_lista()
 
-    def mostrar_pendientes():
-        modo_actual.set(
-            "Pendientes"
-        )
-
-        actualizar_lista()
-
-    def mostrar_pagadas():
-        modo_actual.set(
-            "Pagadas"
-        )
-
-        actualizar_lista()
-
-    tk.Button(
-        marco_botones,
-        text="Pendientes",
-        width=18,
-        command=mostrar_pendientes
-    ).grid(
-        row=0,
-        column=0,
-        padx=5
-    )
-
-    tk.Button(
-        marco_botones,
-        text="Pagadas",
-        width=18,
-        command=mostrar_pagadas
-    ).grid(
-        row=0,
-        column=1,
-        padx=5
-    )
-
-    marco_resumen = tk.LabelFrame(
-        v,
-        text="Resumen de cuentas por cobrar",
-        font=("Arial", 11, "bold"),
-        padx=12,
-        pady=8
-    )
-
-    marco_resumen.pack(
-        fill="x",
-        padx=30,
-        pady=(0, 8)
-    )
-
-    etiqueta_pendiente = tk.Label(
-        marco_resumen,
-        font=("Arial", 10, "bold")
-    )
-    etiqueta_pendiente.grid(
-        row=0,
-        column=0,
-        padx=18,
-        pady=4
-    )
-
-    etiqueta_vencido = tk.Label(
-        marco_resumen,
-        font=("Arial", 10, "bold")
-    )
-    etiqueta_vencido.grid(
-        row=0,
-        column=1,
-        padx=18,
-        pady=4
-    )
-
-    etiqueta_pronto = tk.Label(
-        marco_resumen,
-        font=("Arial", 10, "bold")
-    )
-    etiqueta_pronto.grid(
-        row=0,
-        column=2,
-        padx=18,
-        pady=4
-    )
-
-    etiqueta_clientes = tk.Label(
-        marco_resumen,
-        font=("Arial", 10, "bold")
-    )
-    etiqueta_clientes.grid(
-        row=0,
-        column=3,
-        padx=18,
-        pady=4
-    )
-
     def actualizar_resumen():
-        total_pendiente_resumen = 0
+        total_pendiente = 0
         total_vencido = 0
         total_pronto = 0
-        clientes_deudores = set()
+        clientes = set()
+
+        hoy = datetime.now().date()
 
         for cuenta in cuentas_por_cobrar:
             saldo = convertir_numero(
@@ -358,7 +515,7 @@ def abrir_cuentas_por_cobrar(ventana_padre):
             if saldo <= 0:
                 continue
 
-            total_pendiente_resumen += saldo
+            total_pendiente += saldo
 
             cliente = str(
                 cuenta.get(
@@ -368,49 +525,107 @@ def abrir_cuentas_por_cobrar(ventana_padre):
             ).strip()
 
             if cliente:
-                clientes_deudores.add(
+                clientes.add(
                     cliente.lower()
                 )
 
-            alerta = calcular_alerta_vencimiento(
-                cuenta
-            )
+            fecha_texto = str(
+                cuenta.get(
+                    "fecha_vencimiento",
+                    ""
+                )
+            ).strip()
 
-            if alerta.startswith("VENCIDA"):
-                total_vencido += saldo
-            elif (
-                alerta == "VENCE HOY"
-                or alerta.startswith("VENCE PRONTO")
-            ):
-                total_pronto += saldo
+            if fecha_texto:
+                try:
+                    fecha = datetime.strptime(
+                        fecha_texto,
+                        "%Y-%m-%d"
+                    ).date()
 
-        etiqueta_pendiente.config(
-            text=(
-                "Total pendiente\n"
-                f"${total_pendiente_resumen:.2f}"
-            )
+                    dias = (
+                        fecha - hoy
+                    ).days
+
+                    if dias < 0:
+                        total_vencido += saldo
+                    elif dias <= 7:
+                        total_pronto += saldo
+                except ValueError:
+                    pass
+
+        etiquetas_kpi[
+            "pendiente"
+        ].config(
+            text=f"${total_pendiente:,.2f}"
         )
 
-        etiqueta_vencido.config(
-            text=(
-                "Total vencido\n"
-                f"${total_vencido:.2f}"
-            )
+        etiquetas_kpi[
+            "vencido"
+        ].config(
+            text=f"${total_vencido:,.2f}"
         )
 
-        etiqueta_pronto.config(
-            text=(
-                "Vence pronto\n"
-                f"${total_pronto:.2f}"
-            )
+        etiquetas_kpi[
+            "pronto"
+        ].config(
+            text=f"${total_pronto:,.2f}"
         )
 
-        etiqueta_clientes.config(
-            text=(
-                "Clientes con deuda\n"
-                f"{len(clientes_deudores)}"
-            )
+        etiquetas_kpi[
+            "clientes"
+        ].config(
+            text=str(len(clientes))
         )
+
+    def mostrar_pendientes():
+        modo_actual.set(
+            "Pendientes"
+        )
+        actualizar_lista()
+
+    def mostrar_pagadas():
+        modo_actual.set(
+            "Pagadas"
+        )
+        actualizar_lista()
+
+    tk.Button(
+        filtros,
+        text=t("pending"),
+        command=mostrar_pendientes,
+        font=("Segoe UI", 10, "bold"),
+        bg=AZUL,
+        fg="white",
+        activebackground="#2563EB",
+        activeforeground="white",
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=18,
+        pady=8
+    ).pack(
+        side="left"
+    )
+
+    tk.Button(
+        filtros,
+        text=t("paid"),
+        command=mostrar_pagadas,
+        font=("Segoe UI", 10, "bold"),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=18,
+        pady=8
+    ).pack(
+        side="left",
+        padx=(10, 0)
+    )
 
     def actualizar_lista():
         actualizar_resumen()
@@ -443,9 +658,6 @@ def abrir_cuentas_por_cobrar(ventana_padre):
                 ) <= 0
             ]
 
-        total_pendiente = 0
-        total_pagado = 0
-
         for numero, cuenta in enumerate(
             cuentas_mostrar,
             start=1
@@ -471,92 +683,85 @@ def abrir_cuentas_por_cobrar(ventana_padre):
                 )
             )
 
-            total_pendiente += saldo
-            total_pagado += pagado
-
-            caja = tk.LabelFrame(
+            tarjeta = tk.Frame(
                 contenido,
-                text=f"Cuenta {numero}",
-                font=("Arial", 11, "bold"),
-                padx=20,
-                pady=10
+                bg=PANEL_SECUNDARIO,
+                highlightbackground=BORDE,
+                highlightthickness=1
             )
 
-            caja.pack(
+            tarjeta.pack(
                 fill="x",
-                padx=5,
-                pady=8
+                pady=6
+            )
+
+            cabecera = tk.Frame(
+                tarjeta,
+                bg=PANEL_SECUNDARIO
+            )
+
+            cabecera.pack(
+                fill="x",
+                padx=16,
+                pady=(12, 6)
             )
 
             tk.Label(
-                caja,
+                cabecera,
                 text=(
-                    f"Cliente: "
-                    f"{cuenta.get('cliente', '')}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Producto: "
-                    f"{cuenta.get('codigo_producto', '')} - "
-                    f"{cuenta.get('producto', '')}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Fecha de venta: "
-                    f"{cuenta.get('fecha_venta', '')}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Vencimiento: "
-                    f"{cuenta.get('fecha_vencimiento', '')}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=f"Total: ${total:.2f}"
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=f"Pagado: ${pagado:.2f}"
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"SALDO PENDIENTE: "
-                    f"${saldo:.2f}"
+                    f"ACCOUNT #{numero:02d}"
+                    if obtener_idioma() == "en"
+                    else f"CUENTA #{numero:02d}"
                 ),
-                font=("Arial", 11, "bold")
-            ).pack(anchor="w")
+                font=("Segoe UI", 10, "bold"),
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO
+            ).pack(side="left")
 
             tk.Label(
-                caja,
-                text=(
-                    f"Estado: "
-                    f"{cuenta.get('estado', 'Pendiente')}"
+                cabecera,
+                text=f"${saldo:,.2f}",
+                font=("Segoe UI", 11, "bold"),
+                bg=PANEL_SECUNDARIO,
+                fg=(
+                    VERDE
+                    if saldo <= 0
+                    else AMARILLO
                 )
-            ).pack(anchor="w")
+            ).pack(side="right")
 
             alerta = calcular_alerta_vencimiento(
                 cuenta
             )
 
+            detalle = (
+                f"{t('clientes')}: "
+                f"{cuenta.get('cliente', '')}\n"
+                f"{t('product')}: "
+                f"{cuenta.get('codigo_producto', '')} - "
+                f"{cuenta.get('producto', '')}\n"
+                f"{t('sale_date')}: "
+                f"{cuenta.get('fecha_venta', '')}\n"
+                f"{t('due_date')}: "
+                f"{cuenta.get('fecha_vencimiento', '')}\n"
+                f"Total: ${total:,.2f}\n"
+                f"{t('paid_amount')}: ${pagado:,.2f}\n"
+                f"{t('balance_due')}: ${saldo:,.2f}\n"
+                f"{t('alert')}: {alerta}"
+            )
+
             tk.Label(
-                caja,
-                text=f"Alerta: {alerta}",
-                font=("Arial", 10, "bold")
-            ).pack(anchor="w")
+                tarjeta,
+                text=detalle,
+                justify="left",
+                font=("Segoe UI", 9),
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO_SECUNDARIO
+            ).pack(
+                anchor="w",
+                padx=16,
+                pady=(0, 8)
+            )
 
             pagos = cuenta.get(
                 "pagos",
@@ -564,12 +769,15 @@ def abrir_cuentas_por_cobrar(ventana_padre):
             )
 
             tk.Label(
-                caja,
-                text="Historial de pagos:",
-                font=("Arial", 10, "bold")
+                tarjeta,
+                text=t("payment_history"),
+                font=("Segoe UI", 9, "bold"),
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO
             ).pack(
                 anchor="w",
-                pady=(10, 3)
+                padx=16,
+                pady=(4, 4)
             )
 
             if pagos:
@@ -577,66 +785,98 @@ def abrir_cuentas_por_cobrar(ventana_padre):
                     pagos,
                     start=1
                 ):
-                    monto_pago = convertir_numero(
-                        pago.get(
-                            "monto",
-                            0
-                        )
-                    )
-
-                    fecha_pago = pago.get(
-                        "fecha",
-                        "Sin fecha"
-                    )
-
                     tk.Label(
-                        caja,
+                        tarjeta,
                         text=(
                             f"{numero_pago}. "
-                            f"{fecha_pago} - "
-                            f"${monto_pago:.2f}"
-                        )
-                    ).pack(anchor="w")
+                            f"{pago.get('fecha', '')} - "
+                            f"${convertir_numero(pago.get('monto', 0)):,.2f}"
+                        ),
+                        font=("Segoe UI", 9),
+                        bg=PANEL_SECUNDARIO,
+                        fg=TEXTO_SECUNDARIO
+                    ).pack(
+                        anchor="w",
+                        padx=16
+                    )
             else:
                 tk.Label(
-                    caja,
-                    text="Sin pagos registrados."
-                ).pack(anchor="w")
+                    tarjeta,
+                    text=t("no_payments"),
+                    font=("Segoe UI", 9),
+                    bg=PANEL_SECUNDARIO,
+                    fg=TEXTO_SECUNDARIO
+                ).pack(
+                    anchor="w",
+                    padx=16
+                )
 
             if modo == "Pendientes":
                 tk.Button(
-                    caja,
-                    text="Registrar pago",
-                    width=18,
+                    tarjeta,
+                    text=t("register_payment"),
                     command=lambda c=cuenta:
-                    registrar_pago(c)
+                    registrar_pago(c),
+                    font=("Segoe UI", 9, "bold"),
+                    bg=AZUL,
+                    fg="white",
+                    activebackground="#2563EB",
+                    activeforeground="white",
+                    relief="flat",
+                    bd=0,
+                    cursor="hand2",
+                    padx=16,
+                    pady=7
                 ).pack(
                     anchor="w",
-                    pady=(10, 0)
+                    padx=16,
+                    pady=(10, 12)
                 )
+            else:
+                tk.Frame(
+                    tarjeta,
+                    bg=PANEL_SECUNDARIO,
+                    height=10
+                ).pack()
 
-        if modo == "Pendientes":
-            etiqueta_total.config(
-                text=(
-                    f"Total pendiente por cobrar: "
-                    f"${total_pendiente:.2f}"
-                )
-            )
-        else:
-            etiqueta_total.config(
-                text=(
-                    f"Total cobrado en cuentas pagadas: "
-                    f"${total_pagado:.2f}"
-                )
-            )
+        canvas.yview_moveto(0)
 
     actualizar_lista()
 
-    tk.Button(
+    pie = tk.Frame(
         v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
-    ).pack(
-        pady=15
+        bg=FONDO
+    )
+
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 18)
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+        v.destroy()
+
+    tk.Button(
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(side="right")
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
     )

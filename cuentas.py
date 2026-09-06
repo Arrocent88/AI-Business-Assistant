@@ -35,3 +35,8 @@ def guardar_cuentas(cuentas):
 
 
 cuentas_por_cobrar = cargar_cuentas()
+
+
+for cuenta in cuentas_por_cobrar:
+    if "pagos" not in cuenta:
+        cuenta["pagos"] = []

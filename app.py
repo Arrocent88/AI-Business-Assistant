@@ -12,6 +12,8 @@ from cuentas import cuentas_por_cobrar, guardar_cuentas
 from cuentas_ui import abrir_cuentas_por_cobrar
 from cliente_resumen_ui import abrir_resumen_cliente
 from dashboard import calcular_dashboard
+from dashboard_ui import abrir_dashboard_profesional
+from idiomas import t, cambiar_idioma, obtener_idioma
 
 
 # ==================================================
@@ -124,111 +126,703 @@ def registrar_cliente(entrada, v):
 
 
 def abrir_registro_cliente():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    VERDE = "#22C55E"
+
     v = tk.Toplevel(ventana)
 
-    v.title("Registrar cliente")
-    v.geometry("450x260")
-    v.resizable(False, False)
-
-    tk.Label(
-        v,
-        text="REGISTRAR CLIENTE",
-        font=("Arial", 17, "bold")
-    ).pack(pady=(25, 20))
-
-    tk.Label(
-        v,
-        text="Nombre del cliente:"
-    ).pack()
-
-    entrada = tk.Entry(
-        v,
-        width=35,
-        font=("Arial", 11)
+    v.title(
+        "AI Business Assistant - Registrar cliente"
     )
 
-    entrada.pack(pady=10)
+    v.geometry(
+        "620x430"
+    )
+
+    v.minsize(
+        560,
+        390
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
+    )
+
+    encabezado = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 16)
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("new_client_title"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(
+        anchor="w"
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("new_client_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    tarjeta = tk.Frame(
+        v,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    tarjeta.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 25)
+    )
+
+    tk.Label(
+        tarjeta,
+        text=t("client_information"),
+        font=("Segoe UI", 11, "bold"),
+        bg=PANEL,
+        fg=TEXTO
+    ).pack(
+        anchor="w",
+        padx=22,
+        pady=(22, 14)
+    )
+
+    tk.Label(
+        tarjeta,
+        text=t("client_name"),
+        font=("Segoe UI", 9, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        padx=22
+    )
+
+    entrada = tk.Entry(
+        tarjeta,
+        width=40,
+        font=("Segoe UI", 11),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        insertbackground=TEXTO,
+        relief="flat",
+        bd=0
+    )
+
+    entrada.pack(
+        fill="x",
+        padx=22,
+        pady=(8, 22),
+        ipady=9
+    )
+
     entrada.focus()
 
+    botones = tk.Frame(
+        tarjeta,
+        bg=PANEL
+    )
+
+    botones.pack(
+        fill="x",
+        padx=22,
+        pady=(0, 22)
+    )
+
     tk.Button(
-        v,
-        text="Guardar cliente",
-        width=18,
+        botones,
+        text=t("save_client"),
         command=lambda:
         registrar_cliente(
             entrada,
             v
-        )
-    ).pack(pady=15)
+        ),
+        font=("Segoe UI", 10, "bold"),
+        bg=AZUL,
+        fg="white",
+        activebackground="#2563EB",
+        activeforeground="white",
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=9
+    ).pack(
+        side="left"
+    )
+
+    tk.Button(
+        botones,
+        text=t("cancel"),
+        command=v.destroy,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=9
+    ).pack(
+        side="right"
+    )
 
 
 def abrir_clientes():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    VERDE = "#22C55E"
+
     v = tk.Toplevel(ventana)
 
-    v.title("Clientes")
-    v.geometry("600x500")
-    v.resizable(False, False)
+    v.title(
+        "AI Business Assistant - Clientes"
+    )
+
+    v.geometry(
+        "900x720"
+    )
+
+    v.minsize(
+        760,
+        580
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
+    )
+
+    # ==================================================
+    # SCROLL GENERAL
+    # ==================================================
+
+    marco_scroll = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    marco_scroll.pack(
+        fill="both",
+        expand=True
+    )
+
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
+    )
+
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
+    )
+
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox(
+                "all"
+            )
+        )
+    )
+
+    def ajustar_ancho(event):
+        canvas.itemconfigure(
+            ventana_canvas,
+            width=event.width
+        )
+
+    canvas.bind(
+        "<Configure>",
+        ajustar_ancho
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(
+                -1
+                * (
+                    event.delta
+                    / 120
+                )
+            ),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
+
+    # ==================================================
+    # ENCABEZADO
+    # ==================================================
+
+    encabezado = tk.Frame(
+        contenido,
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 16)
+    )
 
     tk.Label(
-        v,
-        text="CLIENTES REGISTRADOS",
-        font=("Arial", 18, "bold")
-    ).pack(pady=20)
+        encabezado,
+        text=t("client_management"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(
+        anchor="w"
+    )
 
-    marco_botones = tk.Frame(v)
+    tk.Label(
+        encabezado,
+        text=t("client_directory_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
 
-    marco_botones.pack(
+    # ==================================================
+    # ACCIONES
+    # ==================================================
+
+    acciones = tk.Frame(
+        contenido,
+        bg=FONDO
+    )
+
+    acciones.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 16)
+    )
+
+    tk.Button(
+        acciones,
+        text=t("new_client"),
+        command=abrir_registro_cliente,
+        font=("Segoe UI", 10, "bold"),
+        bg=AZUL,
+        fg="white",
+        activebackground="#2563EB",
+        activeforeground="white",
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=18,
+        pady=9
+    ).pack(
+        side="left"
+    )
+
+    tk.Button(
+        acciones,
+        text=t("client_intelligence"),
+        command=lambda: abrir_resumen_cliente(
+            v
+        ),
+        font=("Segoe UI", 10, "bold"),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=18,
+        pady=9
+    ).pack(
+        side="left",
+        padx=(10, 0)
+    )
+
+    # ==================================================
+    # RESUMEN
+    # ==================================================
+
+    panel_resumen = tk.Frame(
+        contenido,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    panel_resumen.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 16)
+    )
+
+    tk.Label(
+        panel_resumen,
+        text=t("total_clients"),
+        font=("Segoe UI", 9, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(15, 4)
+    )
+
+    tk.Label(
+        panel_resumen,
+        text=str(
+            len(clientes)
+        ),
+        font=("Segoe UI", 22, "bold"),
+        bg=PANEL,
+        fg=TEXTO
+    ).pack(
+        anchor="w",
+        padx=20,
         pady=(0, 15)
     )
 
-    tk.Button(
-        marco_botones,
-        text="+ Registrar cliente",
-        width=20,
-        command=abrir_registro_cliente
-    ).grid(
-        row=0,
-        column=0,
-        padx=5
+    # ==================================================
+    # LISTA DE CLIENTES
+    # ==================================================
+
+    panel_lista = tk.Frame(
+        contenido,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
     )
 
-    tk.Button(
-        marco_botones,
-        text="Resumen por cliente",
-        width=20,
-        command=lambda: abrir_resumen_cliente(
-            v
-        )
-    ).grid(
-        row=0,
-        column=1,
-        padx=5
+    panel_lista.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 18)
     )
 
-    for numero, cliente in enumerate(
-        clientes,
-        start=1
-    ):
-        tk.Label(
-            v,
-            text=(
-                f"{numero}. "
-                f"{cliente.get('nombre', 'Sin nombre')}"
-            ),
-            font=("Arial", 12),
-            width=40,
-            anchor="w"
-        ).pack(pady=5)
-
-    tk.Button(
-        v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
+    tk.Label(
+        panel_lista,
+        text=t("client_directory"),
+        font=("Segoe UI", 11, "bold"),
+        bg=PANEL,
+        fg=TEXTO
     ).pack(
-        side="bottom",
-        pady=25
+        anchor="w",
+        padx=20,
+        pady=(16, 12)
     )
+
+    if not clientes:
+        tk.Label(
+            panel_lista,
+            text="No clients registered yet.",
+            font=("Segoe UI", 10),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w",
+            padx=20,
+            pady=(0, 20)
+        )
+
+    else:
+        for numero, cliente in enumerate(
+            clientes,
+            start=1
+        ):
+            tarjeta = tk.Frame(
+                panel_lista,
+                bg=PANEL_SECUNDARIO,
+                highlightbackground=BORDE,
+                highlightthickness=1
+            )
+
+            tarjeta.pack(
+                fill="x",
+                padx=16,
+                pady=6
+            )
+
+            tk.Frame(
+                tarjeta,
+                bg=AZUL,
+                width=5
+            ).pack(
+                side="left",
+                fill="y"
+            )
+
+            info = tk.Frame(
+                tarjeta,
+                bg=PANEL_SECUNDARIO
+            )
+
+            info.pack(
+                side="left",
+                fill="both",
+                expand=True,
+                padx=16,
+                pady=12
+            )
+
+            tk.Label(
+                info,
+                text=(
+                    f"{numero:02d}  "
+                    f"{cliente.get('nombre', 'Sin nombre')}"
+                ),
+                font=("Segoe UI", 11, "bold"),
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO
+            ).pack(
+                anchor="w"
+            )
+
+            telefono = str(
+                cliente.get(
+                    "telefono",
+                    ""
+                )
+            ).strip()
+
+            correo = str(
+                cliente.get(
+                    "correo",
+                    ""
+                )
+            ).strip()
+
+            detalles = []
+
+            if telefono:
+                detalles.append(
+                    f"Phone: {telefono}"
+                )
+
+            if correo:
+                detalles.append(
+                    f"Email: {correo}"
+                )
+
+            tk.Label(
+                info,
+                text=(
+                    "  •  ".join(detalles)
+                    if detalles
+                    else "Customer profile"
+                ),
+                font=("Segoe UI", 9),
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO_SECUNDARIO
+            ).pack(
+                anchor="w",
+                pady=(4, 0)
+            )
+
+    # ==================================================
+    # PIE
+    # ==================================================
+
+    pie = tk.Frame(
+        contenido,
+        bg=FONDO
+    )
+
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 25)
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+
+        v.destroy()
+
+    tk.Button(
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(
+        side="right"
+    )
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
+    )
+
+
+
+# ==================================================
+# TEMA PROFESIONAL PARA INVENTARIO
+# ==================================================
+
+def aplicar_tema_inventario(widget):
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    AZUL = "#3B82F6"
+
+    try:
+        if isinstance(widget, tk.Toplevel):
+            widget.configure(
+                bg=FONDO
+            )
+
+        elif isinstance(widget, tk.Frame):
+            widget.configure(
+                bg=PANEL
+            )
+
+        elif isinstance(widget, tk.LabelFrame):
+            widget.configure(
+                bg=PANEL,
+                fg=TEXTO,
+                bd=0,
+                highlightbackground=BORDE,
+                highlightthickness=1
+            )
+
+        elif isinstance(widget, tk.Label):
+            fondo = PANEL
+
+            try:
+                fondo = widget.master.cget("bg")
+            except Exception:
+                pass
+
+            widget.configure(
+                bg=fondo,
+                fg=TEXTO
+            )
+
+        elif isinstance(widget, tk.Entry):
+            widget.configure(
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO,
+                insertbackground=TEXTO,
+                relief="flat",
+                bd=0
+            )
+
+        elif isinstance(widget, tk.Listbox):
+            widget.configure(
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO,
+                selectbackground=AZUL,
+                selectforeground="white",
+                relief="flat",
+                bd=0
+            )
+
+        elif isinstance(widget, tk.Button):
+            widget.configure(
+                bg=AZUL,
+                fg="white",
+                activebackground="#2563EB",
+                activeforeground="white",
+                relief="flat",
+                bd=0,
+                cursor="hand2",
+                font=("Segoe UI", 10, "bold")
+            )
+
+    except tk.TclError:
+        pass
+
+    for hijo in widget.winfo_children():
+        aplicar_tema_inventario(
+            hijo
+        )
 
 
 # ==================================================
@@ -331,24 +925,24 @@ def registrar_producto(
 def abrir_registro_producto():
     v = tk.Toplevel(ventana)
 
-    v.title("Registrar producto")
+    v.title("AI Business Assistant - Product")
     v.geometry("520x600")
     v.resizable(False, False)
 
     tk.Label(
         v,
-        text="REGISTRAR PRODUCTO",
+        text=t("register_product"),
         font=("Arial", 18, "bold")
     ).pack(pady=(25, 20))
 
     campos = {}
 
     etiquetas = [
-        ("codigo", "Código del producto:"),
-        ("nombre", "Nombre del producto:"),
-        ("cantidad", "Cantidad inicial:"),
-        ("costo", "Costo unitario:"),
-        ("precio", "Precio de venta:")
+        ("codigo", t("product_code") + ":"),
+        ("nombre", t("product_name") + ":"),
+        ("cantidad", t("initial_quantity") + ":"),
+        ("costo", t("unit_cost") + ":"),
+        ("precio", t("sale_price") + ":")
     ]
 
     for clave, texto in etiquetas:
@@ -373,7 +967,7 @@ def abrir_registro_producto():
 
     tk.Button(
         v,
-        text="Guardar producto",
+        text=t("save_product"),
         width=20,
         command=lambda:
         registrar_producto(
@@ -385,6 +979,10 @@ def abrir_registro_producto():
             v
         )
     ).pack(pady=10)
+
+    aplicar_tema_inventario(
+        v
+    )
 
 
 # ==================================================
@@ -485,13 +1083,13 @@ def abrir_editor_producto(indice):
 
     v = tk.Toplevel(ventana)
 
-    v.title("Editar producto")
+    v.title("AI Business Assistant - Edit Product")
     v.geometry("520x500")
     v.resizable(False, False)
 
     tk.Label(
         v,
-        text="EDITAR PRODUCTO",
+        text=t("edit_product").upper(),
         font=("Arial", 18, "bold")
     ).pack(
         pady=(25, 20)
@@ -595,8 +1193,20 @@ def abrir_editor_producto(indice):
         )
     ).pack()
 
+    aplicar_tema_inventario(
+        v
+    )
+
 
 def abrir_seleccion_editar_producto():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+
     if not inventario:
         messagebox.showwarning(
             "Sin productos",
@@ -604,18 +1214,88 @@ def abrir_seleccion_editar_producto():
         )
         return
 
-    v = tk.Toplevel(ventana)
+    v = tk.Toplevel(
+        ventana
+    )
 
-    v.title("Seleccionar producto")
-    v.geometry("550x300")
-    v.resizable(False, False)
+    v.title(
+        "AI Business Assistant - Edit Product"
+    )
+
+    v.geometry(
+        "700x420"
+    )
+
+    v.minsize(
+        620,
+        380
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
+    )
+
+    encabezado = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 16)
+    )
 
     tk.Label(
-        v,
-        text="EDITAR PRODUCTO",
-        font=("Arial", 18, "bold")
+        encabezado,
+        text=t("edit_product").upper(),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
     ).pack(
-        pady=(25, 20)
+        anchor="w"
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("select_product"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    panel = tk.Frame(
+        v,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    panel.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 25)
+    )
+
+    tk.Label(
+        panel,
+        text=t("select_product"),
+        font=("Segoe UI", 10, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        padx=22,
+        pady=(22, 8)
     )
 
     opciones = [
@@ -627,14 +1307,16 @@ def abrir_seleccion_editar_producto():
     ]
 
     combo = ttk.Combobox(
-        v,
+        panel,
         values=opciones,
         state="readonly",
-        width=45
+        width=50
     )
 
     combo.pack(
-        pady=(10, 25)
+        fill="x",
+        padx=22,
+        pady=(0, 24)
     )
 
     def continuar():
@@ -648,14 +1330,56 @@ def abrir_seleccion_editar_producto():
             return
 
         v.destroy()
-        abrir_editor_producto(indice)
+        abrir_editor_producto(
+            indice
+        )
+
+    botones = tk.Frame(
+        panel,
+        bg=PANEL
+    )
+
+    botones.pack(
+        fill="x",
+        padx=22,
+        pady=(0, 22)
+    )
 
     tk.Button(
-        v,
-        text="Editar producto",
-        width=20,
-        command=continuar
-    ).pack()
+        botones,
+        text=t("continue_edit"),
+        command=continuar,
+        font=("Segoe UI", 10, "bold"),
+        bg=AZUL,
+        fg="white",
+        activebackground="#2563EB",
+        activeforeground="white",
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=9
+    ).pack(
+        side="left"
+    )
+
+    tk.Button(
+        botones,
+        text=t("cancel"),
+        command=v.destroy,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=9
+    ).pack(
+        side="right"
+    )
 
 
 # ==================================================
@@ -869,24 +1593,246 @@ def abrir_reposicion():
 # HISTORIAL DE REPOSICIONES
 # ==================================================
 
-def abrir_historial_reposiciones():
-    v = tk.Toplevel(ventana)
-
-    v.title("Historial de reposiciones")
-    v.geometry("850x650")
-    v.resizable(False, False)
-
-    tk.Label(
-        v,
-        text="HISTORIAL DE REPOSICIONES",
-        font=("Arial", 18, "bold")
-    ).pack(
-        pady=(20, 10)
+    aplicar_tema_inventario(
+        v
     )
 
-    contenido = crear_area_scroll(v)
+
+def abrir_historial_reposiciones():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    VERDE = "#22C55E"
+    AZUL = "#3B82F6"
+
+    v = tk.Toplevel(
+        ventana
+    )
+
+    v.title(
+        "AI Business Assistant - Restock History"
+    )
+
+    v.geometry(
+        "980x760"
+    )
+
+    v.minsize(
+        820,
+        620
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
+    )
+
+    encabezado = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 15)
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("restock_history_title"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(
+        anchor="w"
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("restock_history"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
 
     total = 0
+
+    for reposicion in reposiciones:
+        cantidad = int(
+            reposicion.get(
+                "cantidad",
+                0
+            )
+        )
+
+        costo = convertir_numero(
+            reposicion.get(
+                "costo_unitario",
+                reposicion.get(
+                    "costo",
+                    0
+                )
+            )
+        )
+
+        inversion = convertir_numero(
+            reposicion.get(
+                "inversion",
+                cantidad * costo
+            )
+        )
+
+        total += inversion
+
+    kpi = tk.Frame(
+        v,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    kpi.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    tk.Frame(
+        kpi,
+        bg=AZUL,
+        width=5
+    ).pack(
+        side="left",
+        fill="y"
+    )
+
+    cuerpo_kpi = tk.Frame(
+        kpi,
+        bg=PANEL
+    )
+
+    cuerpo_kpi.pack(
+        fill="both",
+        expand=True,
+        padx=18,
+        pady=14
+    )
+
+    tk.Label(
+        cuerpo_kpi,
+        text=t("total_restock_investment"),
+        font=("Segoe UI", 9, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w"
+    )
+
+    tk.Label(
+        cuerpo_kpi,
+        text=f"${total:,.2f}",
+        font=("Segoe UI", 20, "bold"),
+        bg=PANEL,
+        fg=TEXTO
+    ).pack(
+        anchor="w",
+        pady=(5, 0)
+    )
+
+    marco_scroll = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    marco_scroll.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 14)
+    )
+
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
+    )
+
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
+    )
+
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox(
+                "all"
+            )
+        )
+    )
+
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(
+                -1
+                * (
+                    event.delta
+                    / 120
+                )
+            ),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
 
     for numero, reposicion in enumerate(
         reposiciones,
@@ -916,85 +1862,117 @@ def abrir_historial_reposiciones():
             )
         )
 
-        total += inversion
-
-        caja = tk.LabelFrame(
+        tarjeta = tk.Frame(
             contenido,
-            text=f"Reposición {numero}",
-            padx=20,
-            pady=10
+            bg=PANEL_SECUNDARIO,
+            highlightbackground=BORDE,
+            highlightthickness=1
         )
 
-        caja.pack(
+        tarjeta.pack(
             fill="x",
-            padx=5,
-            pady=7
+            pady=6
+        )
+
+        cabecera = tk.Frame(
+            tarjeta,
+            bg=PANEL_SECUNDARIO
+        )
+
+        cabecera.pack(
+            fill="x",
+            padx=16,
+            pady=(12, 6)
         )
 
         tk.Label(
-            caja,
+            cabecera,
             text=(
-                "Código: "
-                f"{reposicion.get('codigo', '') or 'SIN CÓDIGO'}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                "Producto: "
-                f"{reposicion.get('producto', '')}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                "Fecha: "
-                f"{reposicion.get('fecha', 'Sin fecha')}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Unidades compradas: "
-                f"{cantidad}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Costo proveedor: "
-                f"${costo:.2f}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Inversión: "
-                f"${inversion:.2f}"
+                f"RESTOCK #{numero:02d}"
+                if obtener_idioma() == "en"
+                else f"REPOSICIÓN #{numero:02d}"
             ),
-            font=("Arial", 10, "bold")
-        ).pack(anchor="w")
+            font=("Segoe UI", 10, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO
+        ).pack(
+            side="left"
+        )
 
-    tk.Label(
+        tk.Label(
+            cabecera,
+            text=f"${inversion:,.2f}",
+            font=("Segoe UI", 11, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=VERDE
+        ).pack(
+            side="right"
+        )
+
+        detalle = (
+            f"{t('code')}: "
+            f"{reposicion.get('codigo', '') or 'SIN CÓDIGO'}\n"
+            f"{t('product')}: "
+            f"{reposicion.get('producto', '')}\n"
+            f"{t('date')}: "
+            f"{reposicion.get('fecha', 'Sin fecha')}\n"
+            f"{t('units_purchased')}: {cantidad}\n"
+            f"{t('supplier_cost_label')}: ${costo:,.2f}"
+        )
+
+        tk.Label(
+            tarjeta,
+            text=detalle,
+            justify="left",
+            font=("Segoe UI", 9),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w",
+            padx=16,
+            pady=(0, 12)
+        )
+
+    pie = tk.Frame(
         v,
-        text=(
-            "Inversión total en reposiciones: "
-            f"${total:.2f}"
-        ),
-        font=("Arial", 12, "bold")
-    ).pack(pady=5)
+        bg=FONDO
+    )
+
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 18)
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+
+        v.destroy()
 
     tk.Button(
-        v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
-    ).pack(pady=15)
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(
+        side="right"
+    )
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
+    )
 
 
 # ==================================================
@@ -1002,26 +1980,40 @@ def abrir_historial_reposiciones():
 # ==================================================
 
 def abrir_lista_compra():
-    v = tk.Toplevel(ventana)
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    VERDE = "#22C55E"
+    AMARILLO = "#F59E0B"
+    AZUL = "#3B82F6"
 
-    v.title("Lista de compra al proveedor")
-    v.geometry("850x650")
-    v.resizable(False, False)
-
-    tk.Label(
-        v,
-        text="LISTA DE COMPRA SUGERIDA",
-        font=("Arial", 18, "bold")
-    ).pack(
-        pady=(20, 5)
+    v = tk.Toplevel(
+        ventana
     )
 
-    tk.Label(
-        v,
-        text="Productos con 10 unidades o menos",
-        font=("Arial", 11)
-    ).pack(
-        pady=(0, 15)
+    v.title(
+        "AI Business Assistant - Purchase List"
+    )
+
+    v.geometry(
+        "980x760"
+    )
+
+    v.minsize(
+        820,
+        620
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
     )
 
     stock_minimo = 10
@@ -1031,28 +2023,29 @@ def abrir_lista_compra():
 
     for item in inventario:
         stock = int(
-            item.get("cantidad", 0)
+            item.get(
+                "cantidad",
+                0
+            )
         )
 
         if stock <= stock_minimo:
             cantidad_comprar = (
-                stock_objetivo - stock
+                stock_objetivo
+                - stock
             )
 
             if cantidad_comprar > 0:
                 productos_comprar.append({
-                    "codigo":
-                        item.get(
-                            "codigo",
-                            ""
-                        ),
-                    "producto":
-                        item.get(
-                            "producto",
-                            ""
-                        ),
-                    "stock":
-                        stock,
+                    "codigo": item.get(
+                        "codigo",
+                        ""
+                    ),
+                    "producto": item.get(
+                        "producto",
+                        ""
+                    ),
+                    "stock": stock,
                     "cantidad_comprar":
                         cantidad_comprar,
                     "costo":
@@ -1064,12 +2057,192 @@ def abrir_lista_compra():
                         )
                 })
 
-    contenido = crear_area_scroll(v)
-
     inversion_total = 0
 
+    for item in productos_comprar:
+        inversion_total += (
+            item["cantidad_comprar"]
+            * item["costo"]
+        )
+
+    encabezado = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 15)
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("purchase_list_title"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(
+        anchor="w"
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("purchase_list_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    kpi = tk.Frame(
+        v,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    kpi.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    tk.Frame(
+        kpi,
+        bg=AMARILLO,
+        width=5
+    ).pack(
+        side="left",
+        fill="y"
+    )
+
+    cuerpo_kpi = tk.Frame(
+        kpi,
+        bg=PANEL
+    )
+
+    cuerpo_kpi.pack(
+        fill="both",
+        expand=True,
+        padx=18,
+        pady=14
+    )
+
+    tk.Label(
+        cuerpo_kpi,
+        text=t("estimated_total_investment"),
+        font=("Segoe UI", 9, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w"
+    )
+
+    tk.Label(
+        cuerpo_kpi,
+        text=f"${inversion_total:,.2f}",
+        font=("Segoe UI", 20, "bold"),
+        bg=PANEL,
+        fg=TEXTO
+    ).pack(
+        anchor="w",
+        pady=(5, 0)
+    )
+
+    marco_scroll = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    marco_scroll.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 14)
+    )
+
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
+    )
+
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
+    )
+
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox(
+                "all"
+            )
+        )
+    )
+
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(
+                -1
+                * (
+                    event.delta
+                    / 120
+                )
+            ),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
+
     texto_copiar = (
-        "LISTA DE COMPRA AL PROVEEDOR\n"
+        "PURCHASE LIST\n"
+        if obtener_idioma() == "en"
+        else "LISTA DE COMPRA AL PROVEEDOR\n"
+    )
+
+    texto_copiar += (
         "--------------------------------\n"
     )
 
@@ -1087,91 +2260,89 @@ def abrir_lista_compra():
             * item["costo"]
         )
 
-        inversion_total += inversion
-
-        caja = tk.LabelFrame(
+        tarjeta = tk.Frame(
             contenido,
-            text=f"Producto {numero}",
-            padx=20,
-            pady=10
+            bg=PANEL_SECUNDARIO,
+            highlightbackground=BORDE,
+            highlightthickness=1
         )
 
-        caja.pack(
+        tarjeta.pack(
             fill="x",
-            padx=5,
-            pady=7
+            pady=6
+        )
+
+        cabecera = tk.Frame(
+            tarjeta,
+            bg=PANEL_SECUNDARIO
+        )
+
+        cabecera.pack(
+            fill="x",
+            padx=16,
+            pady=(12, 6)
         )
 
         tk.Label(
-            caja,
-            text=f"Código: {codigo}",
-            font=("Arial", 10, "bold")
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
+            cabecera,
             text=(
-                f"Producto: "
+                f"{numero:02d}  "
                 f"{item['producto']}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Stock actual: "
-                f"{item['stock']}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Comprar: "
-                f"{item['cantidad_comprar']} unidades"
             ),
-            font=("Arial", 10, "bold")
-        ).pack(anchor="w")
+            font=("Segoe UI", 10, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO
+        ).pack(
+            side="left"
+        )
 
         tk.Label(
-            caja,
-            text=(
-                f"Costo estimado unitario: "
-                f"${item['costo']:.2f}"
-            )
-        ).pack(anchor="w")
+            cabecera,
+            text=f"${inversion:,.2f}",
+            font=("Segoe UI", 11, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=VERDE
+        ).pack(
+            side="right"
+        )
+
+        detalle = (
+            f"{t('code')}: {codigo}\n"
+            f"{t('current_stock')}: {item['stock']}\n"
+            f"{t('buy_units')}: "
+            f"{item['cantidad_comprar']}\n"
+            f"{t('estimated_unit_cost')}: "
+            f"${item['costo']:,.2f}"
+        )
 
         tk.Label(
-            caja,
-            text=(
-                f"Inversión estimada: "
-                f"${inversion:.2f}"
-            )
-        ).pack(anchor="w")
+            tarjeta,
+            text=detalle,
+            justify="left",
+            font=("Segoe UI", 9),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w",
+            padx=16,
+            pady=(0, 12)
+        )
 
         texto_copiar += (
-            f"\nCódigo: {codigo}\n"
-            f"Producto: {item['producto']}\n"
-            f"Cantidad: "
+            f"\n{t('code')}: {codigo}\n"
+            f"{t('product')}: "
+            f"{item['producto']}\n"
+            f"{t('quantity')}: "
             f"{item['cantidad_comprar']}\n"
-            f"Costo estimado: "
+            f"{t('estimated_unit_cost')}: "
             f"${item['costo']:.2f}\n"
         )
 
     texto_copiar += (
         "\n--------------------------------\n"
-        f"INVERSIÓN TOTAL ESTIMADA: "
+        f"{t('estimated_total_investment')}: "
         f"${inversion_total:.2f}"
     )
-
-    tk.Label(
-        v,
-        text=(
-            "Inversión total estimada: "
-            f"${inversion_total:.2f}"
-        ),
-        font=("Arial", 13, "bold")
-    ).pack(pady=5)
 
     def copiar_lista():
         v.clipboard_clear()
@@ -1181,36 +2352,71 @@ def abrir_lista_compra():
         )
 
         messagebox.showinfo(
-            "Lista copiada",
+            "Lista copiada"
+            if obtener_idioma() == "es"
+            else "List copied",
             "La lista fue copiada correctamente."
+            if obtener_idioma() == "es"
+            else "The purchase list was copied successfully."
         )
 
-    botones = tk.Frame(v)
+    pie = tk.Frame(
+        v,
+        bg=FONDO
+    )
 
-    botones.pack(
-        pady=10
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 18)
     )
 
     tk.Button(
-        botones,
-        text="Copiar lista",
-        width=18,
-        command=copiar_lista
-    ).grid(
-        row=0,
-        column=0,
-        padx=5
+        pie,
+        text=t("copy_list"),
+        command=copiar_lista,
+        font=("Segoe UI", 10, "bold"),
+        bg=AZUL,
+        fg="white",
+        activebackground="#2563EB",
+        activeforeground="white",
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(
+        side="left"
     )
 
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+
+        v.destroy()
+
     tk.Button(
-        botones,
-        text="Cerrar",
-        width=18,
-        command=v.destroy
-    ).grid(
-        row=0,
-        column=1,
-        padx=5
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(
+        side="right"
+    )
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
     )
 
 
@@ -1219,102 +2425,402 @@ def abrir_lista_compra():
 # ==================================================
 
 def abrir_inventario():
-    v = tk.Toplevel(ventana)
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    VERDE = "#22C55E"
+    AMARILLO = "#F59E0B"
+    CYAN = "#06B6D4"
 
-    v.title("Inventario")
-    v.geometry("950x720")
-    v.resizable(False, False)
-
-    tk.Label(
-        v,
-        text="INVENTARIO",
-        font=("Arial", 18, "bold")
-    ).pack(
-        pady=(15, 10)
+    v = tk.Toplevel(
+        ventana
     )
 
-    botones = tk.Frame(v)
+    v.title(
+        "AI Business Assistant - Inventory"
+    )
 
-    botones.pack(
-        pady=(0, 10)
+    v.geometry(
+        "1050x780"
+    )
+
+    v.minsize(
+        850,
+        620
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
+    )
+
+    encabezado = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 14)
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("inventory_management"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(
+        anchor="w"
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("inventory_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    acciones = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    acciones.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
     )
 
     opciones = [
         (
-            "+ Registrar producto",
-            abrir_registro_producto
+            t("new_product"),
+            abrir_registro_producto,
+            AZUL
         ),
         (
-            "+ Registrar reposición",
-            abrir_reposicion
+            t("new_restock"),
+            abrir_reposicion,
+            VERDE
         ),
         (
-            "Editar producto",
-            abrir_seleccion_editar_producto
+            t("edit_product"),
+            abrir_seleccion_editar_producto,
+            PANEL_SECUNDARIO
         ),
         (
-            "Historial reposiciones",
-            abrir_historial_reposiciones
+            t("restock_history"),
+            abrir_historial_reposiciones,
+            PANEL_SECUNDARIO
         ),
         (
-            "Lista de compra",
-            abrir_lista_compra
+            t("purchase_list"),
+            abrir_lista_compra,
+            PANEL_SECUNDARIO
         )
     ]
 
-    for indice, (
-        texto,
-        comando
-    ) in enumerate(opciones):
-
+    for texto_boton, comando, color in opciones:
         tk.Button(
-            botones,
-            text=texto,
-            width=18,
-            command=comando
-        ).grid(
-            row=indice // 3,
-            column=indice % 3,
-            padx=4,
-            pady=4
+            acciones,
+            text=texto_boton,
+            command=comando,
+            font=("Segoe UI", 10, "bold"),
+            bg=color,
+            fg="white",
+            activebackground="#24344D",
+            activeforeground="white",
+            relief="flat",
+            bd=0,
+            cursor="hand2",
+            padx=15,
+            pady=8
+        ).pack(
+            side="left",
+            padx=(0, 8)
         )
 
-    marco_busqueda = tk.Frame(v)
+    capital_inventario = 0
+    valor_inventario = 0
 
-    marco_busqueda.pack(
-        pady=(5, 10)
+    for item in inventario:
+        cantidad = int(
+            item.get(
+                "cantidad",
+                0
+            )
+        )
+
+        costo = convertir_numero(
+            item.get(
+                "costo",
+                0
+            )
+        )
+
+        precio = convertir_numero(
+            item.get(
+                "precio",
+                0
+            )
+        )
+
+        capital_inventario += (
+            cantidad * costo
+        )
+
+        valor_inventario += (
+            cantidad * precio
+        )
+
+    ganancia_potencial = (
+        valor_inventario
+        - capital_inventario
+    )
+
+    marco_kpis = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    marco_kpis.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    datos_kpi = [
+        (
+            t("inventory_capital"),
+            f"${capital_inventario:,.2f}",
+            AZUL
+        ),
+        (
+            t("inventory_value"),
+            f"${valor_inventario:,.2f}",
+            CYAN
+        ),
+        (
+            t("potential_profit"),
+            f"${ganancia_potencial:,.2f}",
+            VERDE
+        )
+    ]
+
+    for columna, (
+        titulo,
+        valor,
+        color
+    ) in enumerate(datos_kpi):
+        tarjeta = tk.Frame(
+            marco_kpis,
+            bg=PANEL,
+            highlightbackground=BORDE,
+            highlightthickness=1,
+            height=95
+        )
+
+        tarjeta.grid(
+            row=0,
+            column=columna,
+            padx=5,
+            sticky="nsew"
+        )
+
+        tarjeta.grid_propagate(
+            False
+        )
+
+        marco_kpis.grid_columnconfigure(
+            columna,
+            weight=1
+        )
+
+        tk.Frame(
+            tarjeta,
+            bg=color,
+            width=5
+        ).pack(
+            side="left",
+            fill="y"
+        )
+
+        cuerpo_kpi = tk.Frame(
+            tarjeta,
+            bg=PANEL
+        )
+
+        cuerpo_kpi.pack(
+            fill="both",
+            expand=True,
+            padx=14,
+            pady=12
+        )
+
+        tk.Label(
+            cuerpo_kpi,
+            text=titulo,
+            font=("Segoe UI", 8, "bold"),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w"
+        )
+
+        tk.Label(
+            cuerpo_kpi,
+            text=valor,
+            font=("Segoe UI", 17, "bold"),
+            bg=PANEL,
+            fg=TEXTO
+        ).pack(
+            anchor="w",
+            pady=(6, 0)
+        )
+
+    panel_busqueda = tk.Frame(
+        v,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    panel_busqueda.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 12)
     )
 
     tk.Label(
-        marco_busqueda,
-        text="Buscar por código o nombre:",
-        font=("Arial", 11, "bold")
+        panel_busqueda,
+        text=t("inventory_search"),
+        font=("Segoe UI", 9, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
     ).pack(
-        side="left",
-        padx=(0, 10)
+        anchor="w",
+        padx=18,
+        pady=(12, 5)
     )
 
     variable_busqueda = tk.StringVar()
 
-    tk.Entry(
-        marco_busqueda,
+    entrada_busqueda = tk.Entry(
+        panel_busqueda,
         textvariable=variable_busqueda,
-        width=30,
-        font=("Arial", 11)
-    ).pack(
-        side="left"
+        font=("Segoe UI", 11),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        insertbackground=TEXTO,
+        relief="flat",
+        bd=0
     )
 
-    contenido = crear_area_scroll(v)
+    entrada_busqueda.pack(
+        fill="x",
+        padx=18,
+        pady=(0, 12),
+        ipady=8
+    )
 
-    mensaje = tk.Label(
+    marco_scroll = tk.Frame(
         v,
-        text=""
+        bg=FONDO
     )
 
-    mensaje.pack()
+    marco_scroll.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 12)
+    )
 
-    def mostrar_productos():
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
+    )
+
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
+    )
+
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox(
+                "all"
+            )
+        )
+    )
+
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(
+                -1
+                * (
+                    event.delta
+                    / 120
+                )
+            ),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
+
+    def mostrar_productos(*args):
         for widget in (
             contenido.winfo_children()
         ):
@@ -1330,11 +2836,17 @@ def abrir_inventario():
 
         for item in inventario:
             codigo = str(
-                item.get("codigo", "")
+                item.get(
+                    "codigo",
+                    ""
+                )
             ).lower()
 
             nombre = str(
-                item.get("producto", "")
+                item.get(
+                    "producto",
+                    ""
+                )
             ).lower()
 
             if (
@@ -1346,16 +2858,15 @@ def abrir_inventario():
                     item
                 )
 
-        mensaje.config(
-            text=(
-                "Productos encontrados: "
-                f"{len(encontrados)}"
-            )
-        )
-
-        for item in encontrados:
+        for numero, item in enumerate(
+            encontrados,
+            start=1
+        ):
             codigo = (
-                item.get("codigo", "")
+                item.get(
+                    "codigo",
+                    ""
+                )
                 or "SIN CÓDIGO"
             )
 
@@ -1389,74 +2900,269 @@ def abrir_inventario():
                 cantidad * precio
             )
 
-            caja = tk.LabelFrame(
+            tarjeta = tk.Frame(
                 contenido,
-                text=nombre,
-                font=("Arial", 12, "bold"),
-                padx=20,
-                pady=10
+                bg=PANEL_SECUNDARIO,
+                highlightbackground=BORDE,
+                highlightthickness=1
             )
 
-            caja.pack(
+            tarjeta.pack(
                 fill="x",
-                padx=5,
-                pady=8
+                pady=6
+            )
+
+            cabecera = tk.Frame(
+                tarjeta,
+                bg=PANEL_SECUNDARIO
+            )
+
+            cabecera.pack(
+                fill="x",
+                padx=16,
+                pady=(12, 6)
             )
 
             tk.Label(
-                caja,
-                text=f"Código: {codigo}",
-                font=("Arial", 11, "bold")
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
+                cabecera,
                 text=(
-                    f"Stock disponible: "
-                    f"{cantidad}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Costo promedio: "
-                    f"${costo:.2f}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Precio de venta: "
-                    f"${precio:.2f}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Valor potencial: "
-                    f"${valor:.2f}"
+                    f"{numero:02d}  {nombre}"
                 ),
-                font=("Arial", 11, "bold")
-            ).pack(anchor="w")
+                font=("Segoe UI", 10, "bold"),
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO
+            ).pack(
+                side="left"
+            )
+
+            tk.Label(
+                cabecera,
+                text=f"${valor:,.2f}",
+                font=("Segoe UI", 11, "bold"),
+                bg=PANEL_SECUNDARIO,
+                fg=VERDE
+            ).pack(
+                side="right"
+            )
+
+            detalle = (
+                f"Code: {codigo}\n"
+                f"{t('stock_available')}: {cantidad}\n"
+                f"{t('average_cost')}: ${costo:,.2f}\n"
+                f"{t('sale_price')}: ${precio:,.2f}"
+            )
+
+            tk.Label(
+                tarjeta,
+                text=detalle,
+                justify="left",
+                font=("Segoe UI", 9),
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO_SECUNDARIO
+            ).pack(
+                anchor="w",
+                padx=16,
+                pady=(0, 12)
+            )
+
+        canvas.yview_moveto(
+            0
+        )
 
     variable_busqueda.trace_add(
         "write",
-        lambda *args:
-        mostrar_productos()
+        mostrar_productos
     )
 
     mostrar_productos()
 
-    tk.Button(
+    pie = tk.Frame(
         v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
-    ).pack(pady=15)
+        bg=FONDO
+    )
 
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 18)
+    )
+
+    etiqueta_encontrados = tk.Label(
+        pie,
+        text=(
+            f"{t('products_found')}: "
+            f"{len(inventario)}"
+        ),
+        font=("Segoe UI", 9),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    )
+
+    etiqueta_encontrados.pack(
+        side="left"
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+
+        v.destroy()
+
+    tk.Button(
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(
+        side="right"
+    )
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
+    )
+
+    entrada_busqueda.focus()
+
+
+# ==================================================
+# TEMA PROFESIONAL PARA VENTAS
+# ==================================================
+
+def aplicar_tema_ventas(widget):
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+
+    try:
+        if isinstance(widget, (tk.Toplevel, tk.Frame)):
+            widget.configure(
+                bg=FONDO
+                if isinstance(widget, tk.Toplevel)
+                else PANEL
+            )
+
+        elif isinstance(widget, tk.LabelFrame):
+            widget.configure(
+                bg=PANEL,
+                fg=TEXTO,
+                highlightbackground=BORDE,
+                highlightthickness=1,
+                bd=0
+            )
+
+        elif isinstance(widget, tk.Label):
+            fondo_padre = PANEL
+
+            try:
+                fondo_padre = widget.master.cget("bg")
+            except Exception:
+                pass
+
+            widget.configure(
+                bg=fondo_padre,
+                fg=TEXTO
+            )
+
+        elif isinstance(widget, tk.Button):
+            widget.configure(
+                bg=AZUL,
+                fg="white",
+                activebackground="#2563EB",
+                activeforeground="white",
+                relief="flat",
+                bd=0,
+                cursor="hand2",
+                font=("Segoe UI", 10, "bold")
+            )
+
+        elif isinstance(widget, tk.Entry):
+            widget.configure(
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO,
+                insertbackground=TEXTO,
+                relief="flat",
+                bd=0
+            )
+
+        elif isinstance(widget, tk.Listbox):
+            widget.configure(
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO,
+                selectbackground=AZUL,
+                selectforeground="white",
+                relief="flat",
+                bd=0
+            )
+
+        elif isinstance(widget, tk.Canvas):
+            widget.configure(
+                bg=FONDO,
+                highlightthickness=0
+            )
+
+        if isinstance(widget, ttk.Combobox):
+            estilo = ttk.Style()
+
+            try:
+                estilo.theme_use(
+                    "clam"
+                )
+            except Exception:
+                pass
+
+            estilo.configure(
+                "Ventas.TCombobox",
+                fieldbackground=PANEL_SECUNDARIO,
+                background=PANEL_SECUNDARIO,
+                foreground=TEXTO,
+                arrowcolor=TEXTO,
+                bordercolor=BORDE,
+                lightcolor=BORDE,
+                darkcolor=BORDE
+            )
+
+            estilo.map(
+                "Ventas.TCombobox",
+                fieldbackground=[
+                    ("readonly", PANEL_SECUNDARIO)
+                ],
+                foreground=[
+                    ("readonly", TEXTO)
+                ],
+                selectbackground=[
+                    ("readonly", PANEL_SECUNDARIO)
+                ],
+                selectforeground=[
+                    ("readonly", TEXTO)
+                ]
+            )
+
+            widget.configure(
+                style="Ventas.TCombobox"
+            )
+
+    except tk.TclError:
+        pass
+
+    for hijo in widget.winfo_children():
+        aplicar_tema_ventas(
+            hijo
+        )
 
 # ==================================================
 # REGISTRAR VENTA
@@ -1487,9 +3193,11 @@ def abrir_registro_venta():
 
     v = tk.Toplevel(ventana)
 
-    v.title("Registrar venta")
-    v.geometry("650x760")
-    v.resizable(False, False)
+    v.title("AI Business Assistant - New Sale")
+    v.geometry("820x820")
+    v.minsize(720, 650)
+    v.resizable(True, True)
+    v.configure(bg="#0B1220")
 
     marco_scroll = tk.Frame(v)
 
@@ -1562,10 +3270,22 @@ def abrir_registro_venta():
 
     tk.Label(
         contenido_venta,
-        text="REGISTRAR VENTA",
-        font=("Arial", 18, "bold")
+        text="NEW SALE",
+        font=("Segoe UI", 22, "bold"),
+        bg="#0B1220",
+        fg="#F4F7FB"
     ).pack(
         pady=(25, 20)
+    )
+
+    tk.Label(
+        contenido_venta,
+        text="Sales transaction and payment registration",
+        font=("Segoe UI", 10),
+        bg="#0B1220",
+        fg="#8FA3BF"
+    ).pack(
+        pady=(0, 18)
     )
 
     tk.Label(
@@ -2268,6 +3988,10 @@ def abrir_registro_venta():
         cerrar_ventana_venta
     )
 
+    aplicar_tema_ventas(
+        v
+    )
+
     entrada_busqueda.focus()
 
 
@@ -2276,64 +4000,309 @@ def abrir_registro_venta():
 # ==================================================
 
 def abrir_historial_ventas():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    VERDE = "#22C55E"
+
     v = tk.Toplevel(ventana)
 
-    v.title("Historial de ventas")
-    v.geometry("900x700")
-    v.resizable(False, False)
+    v.title(
+        "AI Business Assistant - Sales History"
+    )
 
-    tk.Label(
+    v.geometry(
+        "980x760"
+    )
+
+    v.minsize(
+        820,
+        620
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
+    )
+
+    encabezado = tk.Frame(
         v,
-        text="HISTORIAL DE VENTAS",
-        font=("Arial", 18, "bold")
-    ).pack(
-        pady=(20, 10)
+        bg=FONDO
     )
 
-    marco_busqueda = tk.Frame(v)
-
-    marco_busqueda.pack(
-        pady=(0, 10)
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(26, 12)
     )
 
     tk.Label(
-        marco_busqueda,
-        text="Buscar cliente, código, producto o fecha:",
-        font=("Arial", 11, "bold")
+        encabezado,
+        text=t("sales_history"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
     ).pack(
-        side="left",
-        padx=(0, 10)
+        anchor="w"
+    )
+
+    tk.Label(
+        encabezado,
+        text="Search and review every registered transaction",
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    panel_busqueda = tk.Frame(
+        v,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    panel_busqueda.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    tk.Label(
+        panel_busqueda,
+        text=t("search_sales"),
+        font=("Segoe UI", 9, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        padx=18,
+        pady=(14, 6)
     )
 
     variable_busqueda = tk.StringVar()
 
     entrada = tk.Entry(
-        marco_busqueda,
+        panel_busqueda,
         textvariable=variable_busqueda,
-        width=35,
-        font=("Arial", 11)
+        font=("Segoe UI", 11),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        insertbackground=TEXTO,
+        relief="flat",
+        bd=0
     )
 
     entrada.pack(
-        side="left"
+        fill="x",
+        padx=18,
+        pady=(0, 14),
+        ipady=8
     )
 
-    contenido = crear_area_scroll(v)
-
-    etiqueta_totales = tk.Label(
+    panel_totales = tk.Frame(
         v,
-        text="",
-        font=("Arial", 11, "bold")
+        bg=FONDO
     )
 
-    etiqueta_totales.pack(
-        pady=5
+    panel_totales.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 12)
+    )
+
+    etiquetas_totales = {}
+
+    def crear_kpi(columna, titulo, clave, color):
+        tarjeta = tk.Frame(
+            panel_totales,
+            bg=PANEL,
+            highlightbackground=BORDE,
+            highlightthickness=1,
+            height=90
+        )
+
+        tarjeta.grid(
+            row=0,
+            column=columna,
+            padx=5,
+            sticky="nsew"
+        )
+
+        tarjeta.grid_propagate(
+            False
+        )
+
+        panel_totales.grid_columnconfigure(
+            columna,
+            weight=1
+        )
+
+        tk.Frame(
+            tarjeta,
+            bg=color,
+            width=5
+        ).pack(
+            side="left",
+            fill="y"
+        )
+
+        cuerpo = tk.Frame(
+            tarjeta,
+            bg=PANEL
+        )
+
+        cuerpo.pack(
+            fill="both",
+            expand=True,
+            padx=14,
+            pady=12
+        )
+
+        tk.Label(
+            cuerpo,
+            text=titulo,
+            font=("Segoe UI", 8, "bold"),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w"
+        )
+
+        valor = tk.Label(
+            cuerpo,
+            text="0",
+            font=("Segoe UI", 16, "bold"),
+            bg=PANEL,
+            fg=TEXTO
+        )
+
+        valor.pack(
+            anchor="w",
+            pady=(5, 0)
+        )
+
+        etiquetas_totales[
+            clave
+        ] = valor
+
+    crear_kpi(
+        0,
+        t("sales_found"),
+        "cantidad",
+        AZUL
+    )
+
+    crear_kpi(
+        1,
+        t("total_sold"),
+        "total",
+        VERDE
+    )
+
+    crear_kpi(
+        2,
+        t("known_profit"),
+        "ganancia",
+        "#22C55E"
+    )
+
+    marco_scroll = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    marco_scroll.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 15)
+    )
+
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
+    )
+
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
+    )
+
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox(
+                "all"
+            )
+        )
+    )
+
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(
+                -1
+                * (
+                    event.delta
+                    / 120
+                )
+            ),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
     )
 
     def mostrar_historial(*args):
-        for widget in (
-            contenido.winfo_children()
-        ):
+        for widget in contenido.winfo_children():
             widget.destroy()
 
         busqueda = (
@@ -2343,13 +4312,15 @@ def abrir_historial_ventas():
         )
 
         encontradas = []
-
         total_filtrado = 0
         ganancia_filtrada = 0
 
         for venta in ventas:
             cliente = str(
-                venta.get("cliente", "")
+                venta.get(
+                    "cliente",
+                    ""
+                )
             )
 
             codigo = str(
@@ -2360,11 +4331,17 @@ def abrir_historial_ventas():
             )
 
             producto = str(
-                venta.get("producto", "")
+                venta.get(
+                    "producto",
+                    ""
+                )
             )
 
             fecha = str(
-                venta.get("fecha", "")
+                venta.get(
+                    "fecha",
+                    ""
+                )
             )
 
             texto = (
@@ -2390,65 +4367,58 @@ def abrir_historial_ventas():
             start=1
         ):
             monto = convertir_numero(
-                venta.get("monto", 0)
+                venta.get(
+                    "monto",
+                    0
+                )
             )
 
             total_filtrado += monto
 
-            caja = tk.LabelFrame(
+            tarjeta = tk.Frame(
                 contenido,
-                text=f"Venta {numero}",
-                font=("Arial", 11, "bold"),
-                padx=20,
-                pady=10
+                bg=PANEL_SECUNDARIO,
+                highlightbackground=BORDE,
+                highlightthickness=1
             )
 
-            caja.pack(
+            tarjeta.pack(
                 fill="x",
-                padx=5,
-                pady=7
+                pady=6
+            )
+
+            cabecera = tk.Frame(
+                tarjeta,
+                bg=PANEL_SECUNDARIO
+            )
+
+            cabecera.pack(
+                fill="x",
+                padx=16,
+                pady=(12, 6)
             )
 
             tk.Label(
-                caja,
-                text=(
-                    f"Cliente: "
-                    f"{venta.get('cliente', '')}"
-                )
-            ).pack(anchor="w")
+                cabecera,
+                text=f"SALE #{numero}",
+                font=("Segoe UI", 10, "bold"),
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO
+            ).pack(
+                side="left"
+            )
 
             tk.Label(
-                caja,
-                text=(
-                    f"Código: "
-                    f"{venta.get('codigo_producto', '') or 'SIN CÓDIGO'}"
-                )
-            ).pack(anchor="w")
+                cabecera,
+                text=f"${monto:,.2f}",
+                font=("Segoe UI", 11, "bold"),
+                bg=PANEL_SECUNDARIO,
+                fg=VERDE
+            ).pack(
+                side="right"
+            )
 
-            tk.Label(
-                caja,
-                text=(
-                    f"Producto: "
-                    f"{venta.get('producto', '')}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Cantidad: "
-                    f"{venta.get('cantidad', 1)}"
-                )
-            ).pack(anchor="w")
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Total vendido: "
-                    f"${monto:.2f}"
-                ),
-                font=("Arial", 10, "bold")
-            ).pack(anchor="w")
+            ganancia_texto = ""
 
             if "ganancia" in venta:
                 ganancia = convertir_numero(
@@ -2460,37 +4430,54 @@ def abrir_historial_ventas():
 
                 ganancia_filtrada += ganancia
 
-                tk.Label(
-                    caja,
-                    text=(
-                        f"Ganancia real: "
-                        f"${ganancia:.2f}"
-                    ),
-                    font=("Arial", 10, "bold")
-                ).pack(anchor="w")
+                ganancia_texto = (
+                    f"\nKnown profit: ${ganancia:,.2f}"
+                )
 
-            fecha = venta.get(
-                "fecha",
-                ""
+            detalle = (
+                f"Client: {venta.get('cliente', '')}\n"
+                f"Code: {venta.get('codigo_producto', '') or 'SIN CÓDIGO'}\n"
+                f"Product: {venta.get('producto', '')}\n"
+                f"Quantity: {venta.get('cantidad', 1)}\n"
+                f"Date: {venta.get('fecha', '') or 'Sin fecha'}"
+                f"{ganancia_texto}"
             )
 
-            if fecha:
-                tk.Label(
-                    caja,
-                    text=f"Fecha: {fecha}"
-                ).pack(anchor="w")
-
-        etiqueta_totales.config(
-            text=(
-                f"Ventas encontradas: "
-                f"{len(encontradas)}"
-                f"     |     "
-                f"Total vendido: "
-                f"${total_filtrado:.2f}"
-                f"     |     "
-                f"Ganancia conocida: "
-                f"${ganancia_filtrada:.2f}"
+            tk.Label(
+                tarjeta,
+                text=detalle,
+                justify="left",
+                font=("Segoe UI", 9),
+                bg=PANEL_SECUNDARIO,
+                fg=TEXTO_SECUNDARIO
+            ).pack(
+                anchor="w",
+                padx=16,
+                pady=(0, 12)
             )
+
+        etiquetas_totales[
+            "cantidad"
+        ].config(
+            text=str(
+                len(encontradas)
+            )
+        )
+
+        etiquetas_totales[
+            "total"
+        ].config(
+            text=f"${total_filtrado:,.2f}"
+        )
+
+        etiquetas_totales[
+            "ganancia"
+        ].config(
+            text=f"${ganancia_filtrada:,.2f}"
+        )
+
+        canvas.yview_moveto(
+            0
         )
 
     variable_busqueda.trace_add(
@@ -2500,16 +4487,48 @@ def abrir_historial_ventas():
 
     mostrar_historial()
 
-    entrada.focus()
+    pie = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 18)
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+
+        v.destroy()
 
     tk.Button(
-        v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
     ).pack(
-        pady=10
+        side="right"
     )
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
+    )
+
+    entrada.focus()
 
 
 # ==================================================
@@ -2517,29 +4536,45 @@ def abrir_historial_ventas():
 # ==================================================
 
 def abrir_reporte_ganancias():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    VERDE = "#22C55E"
+    AMARILLO = "#F59E0B"
+
     v = tk.Toplevel(ventana)
 
-    v.title("Reporte de ganancias")
-    v.geometry("850x650")
-    v.resizable(False, False)
-
-    tk.Label(
-        v,
-        text="REPORTE DE GANANCIAS",
-        font=("Arial", 18, "bold")
-    ).pack(
-        pady=(20, 10)
+    v.title(
+        "AI Business Assistant - Profit Report"
     )
 
-    contenido = crear_area_scroll(v)
+    v.geometry(
+        "980x760"
+    )
+
+    v.minsize(
+        820,
+        620
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
+    )
 
     ventas_con_costo = 0
     ventas_historicas = 0
-
     ingresos_conocidos = 0
     costos_conocidos = 0
     ganancia_total = 0
-
     resumen = {}
 
     for venta in ventas:
@@ -2563,11 +4598,17 @@ def abrir_reporte_ganancias():
         )
 
         cantidad = int(
-            venta.get("cantidad", 0)
+            venta.get(
+                "cantidad",
+                0
+            )
         )
 
         ingreso = convertir_numero(
-            venta.get("monto", 0)
+            venta.get(
+                "monto",
+                0
+            )
         )
 
         costo = convertir_numero(
@@ -2595,7 +4636,9 @@ def abrir_reporte_ganancias():
         )
 
         if clave not in resumen:
-            resumen[clave] = {
+            resumen[
+                clave
+            ] = {
                 "codigo": codigo,
                 "producto": producto,
                 "cantidad": 0,
@@ -2620,143 +4663,396 @@ def abrir_reporte_ganancias():
             clave
         ]["ganancia"] += ganancia
 
+    encabezado = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(26, 14)
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("profit_analytics"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(
+        anchor="w"
+    )
+
+    tk.Label(
+        encabezado,
+        text="Known revenue, cost and profitability overview",
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    kpis = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    kpis.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    datos_kpi = [
+        (
+            t("known_revenue"),
+            f"${ingresos_conocidos:,.2f}",
+            AZUL
+        ),
+        (
+            t("known_costs"),
+            f"${costos_conocidos:,.2f}",
+            AMARILLO
+        ),
+        (
+            t("known_profit"),
+            f"${ganancia_total:,.2f}",
+            VERDE
+        )
+    ]
+
+    for columna, (
+        titulo,
+        valor,
+        color
+    ) in enumerate(datos_kpi):
+        tarjeta = tk.Frame(
+            kpis,
+            bg=PANEL,
+            highlightbackground=BORDE,
+            highlightthickness=1,
+            height=95
+        )
+
+        tarjeta.grid(
+            row=0,
+            column=columna,
+            padx=5,
+            sticky="nsew"
+        )
+
+        tarjeta.grid_propagate(
+            False
+        )
+
+        kpis.grid_columnconfigure(
+            columna,
+            weight=1
+        )
+
+        tk.Frame(
+            tarjeta,
+            bg=color,
+            width=5
+        ).pack(
+            side="left",
+            fill="y"
+        )
+
+        cuerpo = tk.Frame(
+            tarjeta,
+            bg=PANEL
+        )
+
+        cuerpo.pack(
+            fill="both",
+            expand=True,
+            padx=14,
+            pady=12
+        )
+
+        tk.Label(
+            cuerpo,
+            text=titulo,
+            font=("Segoe UI", 8, "bold"),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w"
+        )
+
+        tk.Label(
+            cuerpo,
+            text=valor,
+            font=("Segoe UI", 17, "bold"),
+            bg=PANEL,
+            fg=TEXTO
+        ).pack(
+            anchor="w",
+            pady=(6, 0)
+        )
+
+    marco_scroll = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    marco_scroll.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 14)
+    )
+
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
+    )
+
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
+    )
+
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox(
+                "all"
+            )
+        )
+    )
+
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(
+                -1
+                * (
+                    event.delta
+                    / 120
+                )
+            ),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
+
     productos_ordenados = sorted(
         resumen.values(),
-        key=lambda x: x["ganancia"],
+        key=lambda x: x[
+            "ganancia"
+        ],
         reverse=True
     )
+
+    if not productos_ordenados:
+        tk.Label(
+            contenido,
+            text="No known-cost sales available yet.",
+            font=("Segoe UI", 10),
+            bg=FONDO,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w",
+            pady=15
+        )
 
     for numero, datos in enumerate(
         productos_ordenados,
         start=1
     ):
-        caja = tk.LabelFrame(
+        tarjeta = tk.Frame(
             contenido,
+            bg=PANEL_SECUNDARIO,
+            highlightbackground=BORDE,
+            highlightthickness=1
+        )
+
+        tarjeta.pack(
+            fill="x",
+            pady=6
+        )
+
+        cabecera = tk.Frame(
+            tarjeta,
+            bg=PANEL_SECUNDARIO
+        )
+
+        cabecera.pack(
+            fill="x",
+            padx=16,
+            pady=(12, 6)
+        )
+
+        tk.Label(
+            cabecera,
             text=(
-                f"{numero}. "
+                f"{numero:02d}  "
                 f"{datos['producto']}"
             ),
-            font=("Arial", 11, "bold"),
-            padx=20,
-            pady=10
-        )
-
-        caja.pack(
-            fill="x",
-            padx=5,
-            pady=7
+            font=("Segoe UI", 10, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO
+        ).pack(
+            side="left"
         )
 
         tk.Label(
-            caja,
+            cabecera,
             text=(
-                f"Código: "
-                f"{datos['codigo'] or 'SIN CÓDIGO'}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Unidades vendidas: "
-                f"{datos['cantidad']}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Ingresos: "
-                f"${datos['ingresos']:.2f}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Costo de lo vendido: "
-                f"${datos['costos']:.2f}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"GANANCIA REAL: "
-                f"${datos['ganancia']:.2f}"
+                f"${datos['ganancia']:,.2f}"
             ),
-            font=("Arial", 11, "bold")
-        ).pack(anchor="w")
-
-    marco_totales = tk.LabelFrame(
-        v,
-        text="Totales conocidos",
-        font=("Arial", 11, "bold"),
-        padx=20,
-        pady=10
-    )
-
-    marco_totales.pack(
-        fill="x",
-        padx=60,
-        pady=10
-    )
-
-    tk.Label(
-        marco_totales,
-        text=(
-            f"Ventas con costo registrado: "
-            f"{ventas_con_costo}"
+            font=("Segoe UI", 11, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=VERDE
+        ).pack(
+            side="right"
         )
-    ).pack(anchor="w")
 
-    tk.Label(
-        marco_totales,
-        text=(
-            f"Ingresos conocidos: "
-            f"${ingresos_conocidos:.2f}"
+        detalle = (
+            f"Code: {datos['codigo'] or 'SIN CÓDIGO'}\n"
+            f"Units sold: {datos['cantidad']}\n"
+            f"Revenue: ${datos['ingresos']:,.2f}\n"
+            f"Cost of goods sold: ${datos['costos']:,.2f}"
         )
-    ).pack(anchor="w")
 
-    tk.Label(
-        marco_totales,
-        text=(
-            f"Costos conocidos: "
-            f"${costos_conocidos:.2f}"
+        tk.Label(
+            tarjeta,
+            text=detalle,
+            justify="left",
+            font=("Segoe UI", 9),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w",
+            padx=16,
+            pady=(0, 12)
         )
-    ).pack(anchor="w")
-
-    tk.Label(
-        marco_totales,
-        text=(
-            f"GANANCIA REAL CONOCIDA: "
-            f"${ganancia_total:.2f}"
-        ),
-        font=("Arial", 12, "bold")
-    ).pack(anchor="w")
 
     if ventas_historicas > 0:
-        tk.Label(
-            v,
-            text=(
-                f"IMPORTANTE: Hay "
-                f"{ventas_historicas} venta(s) histórica(s) "
-                "sin costo registrado y no se incluyen "
-                "en la ganancia real."
-            ),
-            font=("Arial", 10, "bold"),
-            wraplength=700
-        ).pack(
-            pady=5
+        alerta = tk.Frame(
+            contenido,
+            bg=PANEL,
+            highlightbackground=AMARILLO,
+            highlightthickness=1
         )
 
-    tk.Button(
+        alerta.pack(
+            fill="x",
+            pady=(10, 5)
+        )
+
+        tk.Label(
+            alerta,
+            text=(
+                f"IMPORTANT: {ventas_historicas} historical sale(s) "
+                "do not have cost data and are excluded from known profit."
+            ),
+            font=("Segoe UI", 9, "bold"),
+            wraplength=820,
+            justify="left",
+            bg=PANEL,
+            fg=AMARILLO
+        ).pack(
+            anchor="w",
+            padx=16,
+            pady=12
+        )
+
+    pie = tk.Frame(
         v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
+        bg=FONDO
+    )
+
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 18)
+    )
+
+    tk.Label(
+        pie,
+        text=(
+            f"Sales with registered cost: "
+            f"{ventas_con_costo}"
+        ),
+        font=("Segoe UI", 9),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
     ).pack(
-        pady=10
+        side="left"
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+
+        v.destroy()
+
+    tk.Button(
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(
+        side="right"
+    )
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
     )
 
 
@@ -2765,175 +5061,470 @@ def abrir_reporte_ganancias():
 # ==================================================
 
 def abrir_ventas():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    VERDE = "#22C55E"
+
     v = tk.Toplevel(ventana)
 
-    v.title("Ventas")
-    v.geometry("900x700")
-    v.resizable(False, False)
-
-    tk.Label(
-        v,
-        text="VENTAS REGISTRADAS",
-        font=("Arial", 18, "bold")
-    ).pack(pady=15)
-
-    botones = tk.Frame(v)
-
-    botones.pack(
-        pady=(0, 10)
+    v.title(
+        "AI Business Assistant - Sales"
     )
 
-    tk.Button(
-        botones,
-        text="+ Registrar venta",
-        width=20,
-        command=abrir_registro_venta
-    ).grid(
-        row=0,
-        column=0,
-        padx=5
+    v.geometry(
+        "1000x760"
     )
 
-    tk.Button(
-        botones,
-        text="Historial de ventas",
-        width=20,
-        command=abrir_historial_ventas
-    ).grid(
-        row=0,
-        column=1,
-        padx=5
+    v.minsize(
+        820,
+        620
     )
 
-    tk.Button(
-        botones,
-        text="Reporte de ganancias",
-        width=20,
-        command=abrir_reporte_ganancias
-    ).grid(
-        row=0,
-        column=2,
-        padx=5
+    v.resizable(
+        True,
+        True
     )
 
-    contenido = crear_area_scroll(v)
+    v.configure(
+        bg=FONDO
+    )
 
     total_ventas = 0
     ganancia_conocida = 0
 
-    for numero, venta in enumerate(
-        ventas,
-        start=1
-    ):
-        monto = convertir_numero(
-            venta.get("monto", 0)
-        )
-
-        total_ventas += monto
-
-        caja = tk.LabelFrame(
-            contenido,
-            text=f"Venta {numero}",
-            padx=15,
-            pady=8
-        )
-
-        caja.pack(
-            fill="x",
-            pady=5
-        )
-
-        tk.Label(
-            caja,
-            text=(
-                f"Cliente: "
-                f"{venta.get('cliente', '')}"
+    for venta in ventas:
+        total_ventas += convertir_numero(
+            venta.get(
+                "monto",
+                0
             )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Producto: "
-                f"{venta.get('producto', '')}"
-            )
-        ).pack(anchor="w")
-
-        codigo = venta.get(
-            "codigo_producto",
-            ""
         )
-
-        if codigo:
-            tk.Label(
-                caja,
-                text=f"Código: {codigo}"
-            ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Cantidad: "
-                f"{venta.get('cantidad', 1)}"
-            )
-        ).pack(anchor="w")
-
-        tk.Label(
-            caja,
-            text=(
-                f"Total vendido: "
-                f"${monto:.2f}"
-            ),
-            font=("Arial", 10, "bold")
-        ).pack(anchor="w")
 
         if "ganancia" in venta:
-            ganancia = convertir_numero(
+            ganancia_conocida += convertir_numero(
                 venta.get(
                     "ganancia",
                     0
                 )
             )
 
-            ganancia_conocida += ganancia
-
-            tk.Label(
-                caja,
-                text=(
-                    f"Ganancia real: "
-                    f"${ganancia:.2f}"
-                ),
-                font=("Arial", 10, "bold")
-            ).pack(anchor="w")
-
-    tk.Label(
+    encabezado = tk.Frame(
         v,
-        text=(
-            f"TOTAL DE VENTAS: "
-            f"${total_ventas:.2f}"
-        ),
-        font=("Arial", 13, "bold")
-    ).pack(
-        pady=(5, 2)
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 15)
     )
 
     tk.Label(
-        v,
-        text=(
-            f"GANANCIA REAL CONOCIDA: "
-            f"${ganancia_conocida:.2f}"
-        ),
-        font=("Arial", 12, "bold")
+        encabezado,
+        text=t("sales_management"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
     ).pack(
-        pady=(0, 5)
+        anchor="w"
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("sales_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    acciones = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    acciones.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 15)
     )
 
     tk.Button(
+        acciones,
+        text=t("new_sale"),
+        command=abrir_registro_venta,
+        font=("Segoe UI", 10, "bold"),
+        bg=AZUL,
+        fg="white",
+        activebackground="#2563EB",
+        activeforeground="white",
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=18,
+        pady=9
+    ).pack(
+        side="left"
+    )
+
+    tk.Button(
+        acciones,
+        text=t("sales_history"),
+        command=abrir_historial_ventas,
+        font=("Segoe UI", 10, "bold"),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=18,
+        pady=9
+    ).pack(
+        side="left",
+        padx=(10, 0)
+    )
+
+    tk.Button(
+        acciones,
+        text=t("profit_analytics"),
+        command=abrir_reporte_ganancias,
+        font=("Segoe UI", 10, "bold"),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=18,
+        pady=9
+    ).pack(
+        side="left",
+        padx=(10, 0)
+    )
+
+    kpis = tk.Frame(
         v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
-    ).pack(pady=15)
+        bg=FONDO
+    )
+
+    kpis.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 15)
+    )
+
+    datos_kpi = [
+        (
+            t("total_sales"),
+            f"${total_ventas:,.2f}",
+            AZUL
+        ),
+        (
+            t("known_profit"),
+            f"${ganancia_conocida:,.2f}",
+            VERDE
+        ),
+        (
+            t("transactions"),
+            str(
+                len(ventas)
+            ),
+            "#06B6D4"
+        )
+    ]
+
+    for columna, (
+        titulo,
+        valor,
+        color
+    ) in enumerate(datos_kpi):
+        tarjeta = tk.Frame(
+            kpis,
+            bg=PANEL,
+            highlightbackground=BORDE,
+            highlightthickness=1,
+            height=95
+        )
+
+        tarjeta.grid(
+            row=0,
+            column=columna,
+            padx=5,
+            sticky="nsew"
+        )
+
+        tarjeta.grid_propagate(
+            False
+        )
+
+        kpis.grid_columnconfigure(
+            columna,
+            weight=1
+        )
+
+        tk.Frame(
+            tarjeta,
+            bg=color,
+            width=5
+        ).pack(
+            side="left",
+            fill="y"
+        )
+
+        cuerpo = tk.Frame(
+            tarjeta,
+            bg=PANEL
+        )
+
+        cuerpo.pack(
+            fill="both",
+            expand=True,
+            padx=14,
+            pady=12
+        )
+
+        tk.Label(
+            cuerpo,
+            text=titulo,
+            font=("Segoe UI", 8, "bold"),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w"
+        )
+
+        tk.Label(
+            cuerpo,
+            text=valor,
+            font=("Segoe UI", 17, "bold"),
+            bg=PANEL,
+            fg=TEXTO
+        ).pack(
+            anchor="w",
+            pady=(6, 0)
+        )
+
+    marco_scroll = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    marco_scroll.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 15)
+    )
+
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
+    )
+
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
+    )
+
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox(
+                "all"
+            )
+        )
+    )
+
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(
+                -1
+                * (
+                    event.delta
+                    / 120
+                )
+            ),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
+
+    if not ventas:
+        tk.Label(
+            contenido,
+            text="No sales registered yet.",
+            font=("Segoe UI", 10),
+            bg=FONDO,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w",
+            pady=15
+        )
+
+    for numero, venta in enumerate(
+        ventas,
+        start=1
+    ):
+        monto = convertir_numero(
+            venta.get(
+                "monto",
+                0
+            )
+        )
+
+        tarjeta = tk.Frame(
+            contenido,
+            bg=PANEL_SECUNDARIO,
+            highlightbackground=BORDE,
+            highlightthickness=1
+        )
+
+        tarjeta.pack(
+            fill="x",
+            pady=6
+        )
+
+        cabecera = tk.Frame(
+            tarjeta,
+            bg=PANEL_SECUNDARIO
+        )
+
+        cabecera.pack(
+            fill="x",
+            padx=16,
+            pady=(12, 6)
+        )
+
+        tk.Label(
+            cabecera,
+            text=f"SALE #{numero:02d}",
+            font=("Segoe UI", 10, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO
+        ).pack(
+            side="left"
+        )
+
+        tk.Label(
+            cabecera,
+            text=f"${monto:,.2f}",
+            font=("Segoe UI", 11, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=VERDE
+        ).pack(
+            side="right"
+        )
+
+        detalle = (
+            f"Client: {venta.get('cliente', '')}\n"
+            f"Product: {venta.get('producto', '')}\n"
+            f"Code: {venta.get('codigo_producto', '') or 'SIN CÓDIGO'}\n"
+            f"Quantity: {venta.get('cantidad', 1)}\n"
+            f"Date: {venta.get('fecha', '') or 'Sin fecha'}"
+        )
+
+        tk.Label(
+            tarjeta,
+            text=detalle,
+            justify="left",
+            font=("Segoe UI", 9),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w",
+            padx=16,
+            pady=(0, 12)
+        )
+
+    pie = tk.Frame(
+        v,
+        bg=FONDO
+    )
+
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 18)
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+
+        v.destroy()
+
+    tk.Button(
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(
+        side="right"
+    )
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
+    )
 
 
 # ==================================================
@@ -2998,168 +5589,595 @@ def registrar_gasto(
 
 
 def abrir_registro_gasto():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+
     v = tk.Toplevel(ventana)
 
-    v.title("Registrar gasto")
-    v.geometry("500x420")
-    v.resizable(False, False)
+    v.title(
+        "AI Business Assistant - Expense"
+    )
 
-    tk.Label(
+    v.geometry(
+        "650x520"
+    )
+
+    v.minsize(
+        580,
+        470
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
+    )
+
+    encabezado = tk.Frame(
         v,
-        text="REGISTRAR GASTO",
-        font=("Arial", 18, "bold")
-    ).pack(
-        pady=(25, 20)
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 16)
     )
 
     tk.Label(
+        encabezado,
+        text=t("register_expense"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(anchor="w")
+
+    tk.Label(
+        encabezado,
+        text=t("expense_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    panel = tk.Frame(
         v,
-        text="Descripción:"
-    ).pack()
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    panel.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 25)
+    )
+
+    tk.Label(
+        panel,
+        text=t("description"),
+        font=("Segoe UI", 9, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        padx=22,
+        pady=(22, 6)
+    )
 
     descripcion = tk.Entry(
-        v,
-        width=35
+        panel,
+        font=("Segoe UI", 11),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        insertbackground=TEXTO,
+        relief="flat",
+        bd=0
     )
 
     descripcion.pack(
-        pady=(5, 15)
+        fill="x",
+        padx=22,
+        ipady=8
     )
 
     tk.Label(
-        v,
-        text="Categoría:"
-    ).pack()
+        panel,
+        text=t("category"),
+        font=("Segoe UI", 9, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        padx=22,
+        pady=(16, 6)
+    )
 
-    categoria = ttk.Combobox(
-        v,
-        values=[
+    categorias = (
+        [
             "Transporte",
             "Herramientas",
             "Publicidad",
             "Renta",
             "Servicios",
             "Otros"
-        ],
-        state="readonly",
-        width=32
+        ]
+        if obtener_idioma() == "es"
+        else
+        [
+            "Transportation",
+            "Tools",
+            "Advertising",
+            "Rent",
+            "Services",
+            "Other"
+        ]
+    )
+
+    categoria = ttk.Combobox(
+        panel,
+        values=categorias,
+        state="readonly"
     )
 
     categoria.pack(
-        pady=(5, 15)
+        fill="x",
+        padx=22
     )
 
     tk.Label(
-        v,
-        text="Monto:"
-    ).pack()
+        panel,
+        text=t("amount"),
+        font=("Segoe UI", 9, "bold"),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        padx=22,
+        pady=(16, 6)
+    )
 
     monto = tk.Entry(
-        v,
-        width=20
+        panel,
+        font=("Segoe UI", 11),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        insertbackground=TEXTO,
+        relief="flat",
+        bd=0
     )
 
     monto.pack(
-        pady=(5, 20)
+        fill="x",
+        padx=22,
+        ipady=8
+    )
+
+    botones = tk.Frame(
+        panel,
+        bg=PANEL
+    )
+
+    botones.pack(
+        fill="x",
+        padx=22,
+        pady=22
     )
 
     tk.Button(
-        v,
-        text="Guardar gasto",
-        width=18,
+        botones,
+        text=t("save_expense"),
         command=lambda:
         registrar_gasto(
             descripcion,
             categoria,
             monto,
             v
-        )
-    ).pack()
+        ),
+        font=("Segoe UI", 10, "bold"),
+        bg=AZUL,
+        fg="white",
+        activebackground="#2563EB",
+        activeforeground="white",
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=9
+    ).pack(side="left")
+
+    tk.Button(
+        botones,
+        text=t("cancel"),
+        command=v.destroy,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=9
+    ).pack(side="right")
+
+    descripcion.focus()
 
 
 def abrir_gastos():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    ROJO = "#EF4444"
+    CYAN = "#06B6D4"
+
     v = tk.Toplevel(ventana)
 
-    v.title("Gastos")
-    v.geometry("700x600")
-    v.resizable(False, False)
+    v.title(
+        "AI Business Assistant - Expenses"
+    )
+
+    v.geometry(
+        "980x760"
+    )
+
+    v.minsize(
+        820,
+        620
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(
+        bg=FONDO
+    )
+
+    total = sum(
+        convertir_numero(
+            gasto.get(
+                "monto",
+                0
+            )
+        )
+        for gasto in gastos
+    )
+
+    encabezado = tk.Frame(v, bg=FONDO)
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 14)
+    )
 
     tk.Label(
-        v,
-        text="GASTOS OPERATIVOS",
-        font=("Arial", 18, "bold")
-    ).pack(pady=15)
+        encabezado,
+        text=t("expense_management"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(anchor="w")
+
+    tk.Label(
+        encabezado,
+        text=t("expense_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    acciones = tk.Frame(v, bg=FONDO)
+    acciones.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
 
     tk.Button(
+        acciones,
+        text=t("new_expense"),
+        command=abrir_registro_gasto,
+        font=("Segoe UI", 10, "bold"),
+        bg=AZUL,
+        fg="white",
+        activebackground="#2563EB",
+        activeforeground="white",
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=18,
+        pady=9
+    ).pack(side="left")
+
+    kpis = tk.Frame(v, bg=FONDO)
+    kpis.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    datos_kpi = [
+        (
+            t("total_expenses"),
+            f"${total:,.2f}",
+            ROJO
+        ),
+        (
+            t("expense_count"),
+            str(len(gastos)),
+            CYAN
+        )
+    ]
+
+    for columna, (titulo, valor, color) in enumerate(
+        datos_kpi
+    ):
+        tarjeta = tk.Frame(
+            kpis,
+            bg=PANEL,
+            highlightbackground=BORDE,
+            highlightthickness=1,
+            height=95
+        )
+
+        tarjeta.grid(
+            row=0,
+            column=columna,
+            padx=5,
+            sticky="nsew"
+        )
+
+        tarjeta.grid_propagate(False)
+        kpis.grid_columnconfigure(
+            columna,
+            weight=1
+        )
+
+        tk.Frame(
+            tarjeta,
+            bg=color,
+            width=5
+        ).pack(
+            side="left",
+            fill="y"
+        )
+
+        cuerpo = tk.Frame(
+            tarjeta,
+            bg=PANEL
+        )
+
+        cuerpo.pack(
+            fill="both",
+            expand=True,
+            padx=14,
+            pady=12
+        )
+
+        tk.Label(
+            cuerpo,
+            text=titulo,
+            font=("Segoe UI", 8, "bold"),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO
+        ).pack(anchor="w")
+
+        tk.Label(
+            cuerpo,
+            text=valor,
+            font=("Segoe UI", 17, "bold"),
+            bg=PANEL,
+            fg=TEXTO
+        ).pack(
+            anchor="w",
+            pady=(6, 0)
+        )
+
+    marco_scroll = tk.Frame(
         v,
-        text="+ Registrar gasto",
-        width=20,
-        command=abrir_registro_gasto
-    ).pack(pady=10)
+        bg=FONDO
+    )
 
-    contenido = crear_area_scroll(v)
+    marco_scroll.pack(
+        fill="both",
+        expand=True,
+        padx=30,
+        pady=(0, 14)
+    )
 
-    total = 0
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
+    )
+
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
+    )
+
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
+
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(-1 * (event.delta / 120)),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
 
     for numero, gasto in enumerate(
         gastos,
         start=1
     ):
         monto = convertir_numero(
-            gasto.get("monto", 0)
+            gasto.get(
+                "monto",
+                0
+            )
         )
 
-        total += monto
-
-        caja = tk.LabelFrame(
+        tarjeta = tk.Frame(
             contenido,
-            text=f"Gasto {numero}",
-            padx=20,
-            pady=8
+            bg=PANEL_SECUNDARIO,
+            highlightbackground=BORDE,
+            highlightthickness=1
         )
 
-        caja.pack(
+        tarjeta.pack(
             fill="x",
-            padx=5,
-            pady=5
+            pady=6
+        )
+
+        cabecera = tk.Frame(
+            tarjeta,
+            bg=PANEL_SECUNDARIO
+        )
+
+        cabecera.pack(
+            fill="x",
+            padx=16,
+            pady=(12, 6)
         )
 
         tk.Label(
-            caja,
+            cabecera,
             text=(
-                "Descripción: "
-                f"{gasto.get('descripcion', gasto.get('concepto', ''))}"
-            )
-        ).pack(anchor="w")
+                f"EXPENSE #{numero:02d}"
+                if obtener_idioma() == "en"
+                else f"GASTO #{numero:02d}"
+            ),
+            font=("Segoe UI", 10, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO
+        ).pack(side="left")
 
         tk.Label(
-            caja,
-            text=(
-                "Categoría: "
-                f"{gasto.get('categoria', '')}"
-            )
-        ).pack(anchor="w")
+            cabecera,
+            text=f"${monto:,.2f}",
+            font=("Segoe UI", 11, "bold"),
+            bg=PANEL_SECUNDARIO,
+            fg=ROJO
+        ).pack(side="right")
+
+        detalle = (
+            f"{t('description')}: "
+            f"{gasto.get('descripcion', gasto.get('concepto', ''))}\n"
+            f"{t('category')}: "
+            f"{gasto.get('categoria', '')}"
+        )
 
         tk.Label(
-            caja,
-            text=f"Monto: ${monto:.2f}"
-        ).pack(anchor="w")
+            tarjeta,
+            text=detalle,
+            justify="left",
+            font=("Segoe UI", 9),
+            bg=PANEL_SECUNDARIO,
+            fg=TEXTO_SECUNDARIO
+        ).pack(
+            anchor="w",
+            padx=16,
+            pady=(0, 12)
+        )
 
-    tk.Label(
-        v,
-        text=(
-            f"TOTAL DE GASTOS: "
-            f"${total:.2f}"
-        ),
-        font=("Arial", 13, "bold")
-    ).pack(pady=5)
+    pie = tk.Frame(v, bg=FONDO)
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 18)
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+        v.destroy()
 
     tk.Button(
-        v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
-    ).pack(pady=15)
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(side="right")
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
+    )
 
 
 # ==================================================
@@ -3167,11 +6185,39 @@ def abrir_gastos():
 # ==================================================
 
 def abrir_resumen():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    VERDE = "#22C55E"
+    ROJO = "#EF4444"
+    CYAN = "#06B6D4"
+    AMARILLO = "#F59E0B"
+
     v = tk.Toplevel(ventana)
 
-    v.title("Resumen del negocio")
-    v.geometry("700x650")
-    v.resizable(False, False)
+    v.title(
+        "AI Business Assistant - Business Summary"
+    )
+
+    v.geometry(
+        "1050x780"
+    )
+
+    v.minsize(
+        850,
+        620
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(bg=FONDO)
 
     ingresos = sum(
         convertir_numero(
@@ -3211,13 +6257,8 @@ def abrir_resumen():
             item.get("precio", 0)
         )
 
-        capital += (
-            cantidad * costo
-        )
-
-        valor_venta += (
-            cantidad * precio
-        )
+        capital += cantidad * costo
+        valor_venta += cantidad * precio
 
     ganancia_potencial = (
         valor_venta - capital
@@ -3237,81 +6278,349 @@ def abrir_resumen():
     )
 
     if flujo > 0:
-        estado = "POSITIVO"
+        estado = t("positive")
+        color_estado = VERDE
 
     elif flujo < 0:
-        estado = "NEGATIVO"
+        estado = t("negative")
+        color_estado = ROJO
 
     else:
-        estado = "EQUILIBRADO"
+        estado = t("balanced")
+        color_estado = AMARILLO
 
-    tk.Label(
-        v,
-        text="RESUMEN DEL NEGOCIO",
-        font=("Arial", 18, "bold")
-    ).pack(pady=25)
-
-    caja = tk.LabelFrame(
-        v,
-        text="Información general",
-        font=("Arial", 12, "bold"),
-        padx=30,
-        pady=20
+    marco_scroll = tk.Frame(v, bg=FONDO)
+    marco_scroll.pack(
+        fill="both",
+        expand=True
     )
 
-    caja.pack(
-        fill="x",
-        padx=60
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
     )
 
-    datos = [
-        f"Clientes registrados: {len(clientes)}",
-        f"Ventas registradas: {len(ventas)}",
-        f"Ingresos por ventas: ${ingresos:.2f}",
-        (
-            "Ganancia real conocida: "
-            f"${ganancia_real_conocida:.2f}"
-        ),
-        (
-            "Gastos operativos: "
-            f"${gastos_totales:.2f}"
-        ),
-        "",
-        (
-            "Capital en inventario: "
-            f"${capital:.2f}"
-        ),
-        (
-            "Valor del inventario: "
-            f"${valor_venta:.2f}"
-        ),
-        (
-            "Ganancia potencial: "
-            f"${ganancia_potencial:.2f}"
-        ),
-        "",
-        f"Flujo de caja: ${flujo:.2f}",
-        f"Estado: {estado}"
-    ]
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
+    )
 
-    for dato in datos:
-        tk.Label(
-            caja,
-            text=dato,
-            font=("Arial", 11)
-        ).pack(
-            anchor="w",
-            pady=3
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
+        )
+    )
+
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(-1 * (event.delta / 120)),
+            "units"
         )
 
-    tk.Button(
-        v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
+
+    encabezado = tk.Frame(
+        contenido,
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 15)
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("business_summary_title"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(anchor="w")
+
+    tk.Label(
+        encabezado,
+        text=t("business_summary_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
     ).pack(
-        side="bottom",
-        pady=25
+        anchor="w",
+        pady=(4, 0)
+    )
+
+    kpis = tk.Frame(
+        contenido,
+        bg=FONDO
+    )
+
+    kpis.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    datos_kpi = [
+        (
+            t("sales_revenue"),
+            f"${ingresos:,.2f}",
+            AZUL
+        ),
+        (
+            t("known_profit"),
+            f"${ganancia_real_conocida:,.2f}",
+            VERDE
+        ),
+        (
+            t("operating_expenses"),
+            f"${gastos_totales:,.2f}",
+            ROJO
+        ),
+        (
+            t("cash_flow"),
+            f"${flujo:,.2f}",
+            CYAN
+        )
+    ]
+
+    for columna, (titulo, valor, color) in enumerate(
+        datos_kpi
+    ):
+        tarjeta = tk.Frame(
+            kpis,
+            bg=PANEL,
+            highlightbackground=BORDE,
+            highlightthickness=1,
+            height=100
+        )
+
+        tarjeta.grid(
+            row=0,
+            column=columna,
+            padx=5,
+            sticky="nsew"
+        )
+
+        tarjeta.grid_propagate(False)
+        kpis.grid_columnconfigure(
+            columna,
+            weight=1
+        )
+
+        tk.Frame(
+            tarjeta,
+            bg=color,
+            width=5
+        ).pack(
+            side="left",
+            fill="y"
+        )
+
+        cuerpo = tk.Frame(
+            tarjeta,
+            bg=PANEL
+        )
+
+        cuerpo.pack(
+            fill="both",
+            expand=True,
+            padx=14,
+            pady=12
+        )
+
+        tk.Label(
+            cuerpo,
+            text=titulo,
+            font=("Segoe UI", 8, "bold"),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO
+        ).pack(anchor="w")
+
+        tk.Label(
+            cuerpo,
+            text=valor,
+            font=("Segoe UI", 16, "bold"),
+            bg=PANEL,
+            fg=TEXTO
+        ).pack(
+            anchor="w",
+            pady=(6, 0)
+        )
+
+    panel_general = tk.Frame(
+        contenido,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    panel_general.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    tk.Label(
+        panel_general,
+        text=t("financial_status"),
+        font=("Segoe UI", 11, "bold"),
+        bg=PANEL,
+        fg=TEXTO
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(16, 10)
+    )
+
+    resumen_texto = (
+        f"{t('registered_clients')}: {len(clientes)}\n"
+        f"{t('registered_sales')}: {len(ventas)}\n"
+        f"{t('financial_status')}: {estado}"
+    )
+
+    tk.Label(
+        panel_general,
+        text=resumen_texto,
+        justify="left",
+        font=("Segoe UI", 10),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(0, 16)
+    )
+
+    tk.Label(
+        panel_general,
+        text=estado,
+        font=("Segoe UI", 14, "bold"),
+        bg=PANEL,
+        fg=color_estado
+    ).pack(
+        anchor="e",
+        padx=20,
+        pady=(0, 16)
+    )
+
+    panel_inv = tk.Frame(
+        contenido,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
+    )
+
+    panel_inv.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    tk.Label(
+        panel_inv,
+        text=t("inventory_position"),
+        font=("Segoe UI", 11, "bold"),
+        bg=PANEL,
+        fg=TEXTO
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(16, 10)
+    )
+
+    tk.Label(
+        panel_inv,
+        text=(
+            f"{t('inventory_capital')}: ${capital:,.2f}\n"
+            f"{t('inventory_value')}: ${valor_venta:,.2f}\n"
+            f"{t('potential_profit')}: ${ganancia_potencial:,.2f}"
+        ),
+        justify="left",
+        font=("Segoe UI", 10),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(0, 16)
+    )
+
+    pie = tk.Frame(
+        contenido,
+        bg=FONDO
+    )
+
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 25)
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+        v.destroy()
+
+    tk.Button(
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(side="right")
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
     )
 
 
@@ -3320,6 +6629,17 @@ def abrir_resumen():
 # ==================================================
 
 def abrir_diagnostico():
+    FONDO = "#0B1220"
+    PANEL = "#111C2E"
+    PANEL_SECUNDARIO = "#162238"
+    BORDE = "#24344D"
+    TEXTO = "#F4F7FB"
+    TEXTO_SECUNDARIO = "#8FA3BF"
+    AZUL = "#3B82F6"
+    VERDE = "#22C55E"
+    ROJO = "#EF4444"
+    AMARILLO = "#F59E0B"
+
     resultado = calcular_diagnostico(
         ventas,
         inventario,
@@ -3329,136 +6649,371 @@ def abrir_diagnostico():
 
     v = tk.Toplevel(ventana)
 
-    v.title("Diagnóstico inteligente")
-    v.geometry("800x650")
-    v.resizable(False, False)
+    v.title(
+        "AI Business Assistant - Diagnosis"
+    )
 
-    tk.Label(
+    v.geometry(
+        "1050x780"
+    )
+
+    v.minsize(
+        850,
+        620
+    )
+
+    v.resizable(
+        True,
+        True
+    )
+
+    v.configure(bg=FONDO)
+
+    marco_scroll = tk.Frame(
         v,
-        text="DIAGNÓSTICO INTELIGENTE",
-        font=("Arial", 20, "bold")
-    ).pack(
-        pady=(25, 5)
+        bg=FONDO
     )
 
-    tk.Label(
-        v,
-        text="Análisis automático del negocio"
-    ).pack(
-        pady=(0, 20)
+    marco_scroll.pack(
+        fill="both",
+        expand=True
     )
 
-    financiero = tk.LabelFrame(
-        v,
-        text="Estado financiero",
-        font=("Arial", 12, "bold"),
-        padx=25,
-        pady=15
+    canvas = tk.Canvas(
+        marco_scroll,
+        bg=FONDO,
+        highlightthickness=0
     )
 
-    financiero.pack(
-        fill="x",
-        padx=60
+    scrollbar = tk.Scrollbar(
+        marco_scroll,
+        orient="vertical",
+        command=canvas.yview
     )
 
-    tk.Label(
-        financiero,
-        text=(
-            f"Flujo de caja: "
-            f"${resultado['flujo_neto']:.2f}"
+    contenido = tk.Frame(
+        canvas,
+        bg=FONDO
+    )
+
+    ventana_canvas = canvas.create_window(
+        (0, 0),
+        window=contenido,
+        anchor="nw"
+    )
+
+    contenido.bind(
+        "<Configure>",
+        lambda e: canvas.configure(
+            scrollregion=canvas.bbox("all")
         )
+    )
+
+    canvas.bind(
+        "<Configure>",
+        lambda e: canvas.itemconfigure(
+            ventana_canvas,
+            width=e.width
+        )
+    )
+
+    canvas.configure(
+        yscrollcommand=scrollbar.set
+    )
+
+    canvas.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+    scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    def mover_rueda(event):
+        canvas.yview_scroll(
+            int(-1 * (event.delta / 120)),
+            "units"
+        )
+
+    canvas.bind_all(
+        "<MouseWheel>",
+        mover_rueda
+    )
+
+    encabezado = tk.Frame(
+        contenido,
+        bg=FONDO
+    )
+
+    encabezado.pack(
+        fill="x",
+        padx=30,
+        pady=(28, 15)
+    )
+
+    tk.Label(
+        encabezado,
+        text=t("diagnosis_title"),
+        font=("Segoe UI", 22, "bold"),
+        bg=FONDO,
+        fg=TEXTO
+    ).pack(anchor="w")
+
+    tk.Label(
+        encabezado,
+        text=t("diagnosis_subtitle"),
+        font=("Segoe UI", 10),
+        bg=FONDO,
+        fg=TEXTO_SECUNDARIO
     ).pack(
         anchor="w",
-        pady=3
+        pady=(4, 0)
     )
 
-    tk.Label(
-        financiero,
-        text=(
-            f"Estado: "
-            f"{resultado['estado_flujo']}"
+    flujo = resultado[
+        "flujo_neto"
+    ]
+
+    estado_original = str(
+        resultado[
+            "estado_flujo"
+        ]
+    ).upper()
+
+    if "POSIT" in estado_original:
+        estado = t("positive")
+        color_estado = VERDE
+    elif "NEGAT" in estado_original:
+        estado = t("negative")
+        color_estado = ROJO
+    else:
+        estado = t("balanced")
+        color_estado = AMARILLO
+
+    kpis = tk.Frame(
+        contenido,
+        bg=FONDO
+    )
+
+    kpis.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 14)
+    )
+
+    datos_kpi = [
+        (
+            t("cash_flow"),
+            f"${flujo:,.2f}",
+            AZUL
         ),
-        font=("Arial", 11, "bold")
-    ).pack(
-        anchor="w",
-        pady=3
-    )
-
-    tk.Label(
-        financiero,
-        text=(
-            "Ganancia potencial: "
-            f"${resultado['ganancia_potencial']:.2f}"
+        (
+            t("financial_status"),
+            estado,
+            color_estado
+        ),
+        (
+            t("potential_profit"),
+            f"${resultado['ganancia_potencial']:,.2f}",
+            VERDE
+        ),
+        (
+            t("expense_ratio"),
+            f"{resultado['porcentaje_gastos']:.2f}%",
+            AMARILLO
         )
-    ).pack(
-        anchor="w",
-        pady=3
-    )
+    ]
 
-    tk.Label(
-        financiero,
-        text=(
-            "Gastos sobre ventas: "
-            f"{resultado['porcentaje_gastos']:.2f}%"
+    for columna, (titulo, valor, color) in enumerate(
+        datos_kpi
+    ):
+        tarjeta = tk.Frame(
+            kpis,
+            bg=PANEL,
+            highlightbackground=BORDE,
+            highlightthickness=1,
+            height=100
         )
-    ).pack(
-        anchor="w",
-        pady=3
+
+        tarjeta.grid(
+            row=0,
+            column=columna,
+            padx=5,
+            sticky="nsew"
+        )
+
+        tarjeta.grid_propagate(False)
+        kpis.grid_columnconfigure(
+            columna,
+            weight=1
+        )
+
+        tk.Frame(
+            tarjeta,
+            bg=color,
+            width=5
+        ).pack(
+            side="left",
+            fill="y"
+        )
+
+        cuerpo = tk.Frame(
+            tarjeta,
+            bg=PANEL
+        )
+
+        cuerpo.pack(
+            fill="both",
+            expand=True,
+            padx=14,
+            pady=12
+        )
+
+        tk.Label(
+            cuerpo,
+            text=titulo,
+            font=("Segoe UI", 8, "bold"),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO
+        ).pack(anchor="w")
+
+        tk.Label(
+            cuerpo,
+            text=valor,
+            font=("Segoe UI", 16, "bold"),
+            bg=PANEL,
+            fg=TEXTO
+        ).pack(
+            anchor="w",
+            pady=(6, 0)
+        )
+
+    panel_analisis = tk.Frame(
+        contenido,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
     )
 
-    analisis = tk.LabelFrame(
-        v,
-        text="Análisis",
-        font=("Arial", 12, "bold"),
-        padx=25,
-        pady=15
-    )
-
-    analisis.pack(
+    panel_analisis.pack(
         fill="x",
-        padx=60,
-        pady=10
+        padx=30,
+        pady=(0, 14)
+    )
+
+    tk.Label(
+        panel_analisis,
+        text=t("analysis"),
+        font=("Segoe UI", 11, "bold"),
+        bg=PANEL,
+        fg=TEXTO
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(16, 10)
     )
 
     for mensaje in resultado[
         "diagnosticos"
     ]:
         tk.Label(
-            analisis,
-            text=mensaje
+            panel_analisis,
+            text=mensaje,
+            font=("Segoe UI", 10),
+            bg=PANEL,
+            fg=TEXTO_SECUNDARIO,
+            wraplength=900,
+            justify="left"
         ).pack(
             anchor="w",
-            pady=4
+            padx=20,
+            pady=5
         )
 
-    recomendacion = tk.LabelFrame(
-        v,
-        text="Recomendación",
-        font=("Arial", 12, "bold"),
-        padx=25,
-        pady=15
+    tk.Frame(
+        panel_analisis,
+        bg=PANEL,
+        height=10
+    ).pack()
+
+    panel_recomendacion = tk.Frame(
+        contenido,
+        bg=PANEL,
+        highlightbackground=BORDE,
+        highlightthickness=1
     )
 
-    recomendacion.pack(
+    panel_recomendacion.pack(
         fill="x",
-        padx=60
+        padx=30,
+        pady=(0, 14)
     )
 
     tk.Label(
-        recomendacion,
+        panel_recomendacion,
+        text=t("recommendation"),
+        font=("Segoe UI", 11, "bold"),
+        bg=PANEL,
+        fg=TEXTO
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(16, 10)
+    )
+
+    tk.Label(
+        panel_recomendacion,
         text=resultado["recomendacion"],
-        wraplength=620,
+        font=("Segoe UI", 10),
+        bg=PANEL,
+        fg=TEXTO_SECUNDARIO,
+        wraplength=900,
         justify="left"
-    ).pack(anchor="w")
+    ).pack(
+        anchor="w",
+        padx=20,
+        pady=(0, 16)
+    )
+
+    pie = tk.Frame(
+        contenido,
+        bg=FONDO
+    )
+
+    pie.pack(
+        fill="x",
+        padx=30,
+        pady=(0, 25)
+    )
+
+    def cerrar():
+        canvas.unbind_all(
+            "<MouseWheel>"
+        )
+        v.destroy()
 
     tk.Button(
-        v,
-        text="Cerrar",
-        width=15,
-        command=v.destroy
-    ).pack(
-        side="bottom",
-        pady=20
+        pie,
+        text=t("close"),
+        command=cerrar,
+        font=("Segoe UI", 10),
+        bg=PANEL_SECUNDARIO,
+        fg=TEXTO,
+        activebackground=BORDE,
+        activeforeground=TEXTO,
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        padx=20,
+        pady=8
+    ).pack(side="right")
+
+    v.protocol(
+        "WM_DELETE_WINDOW",
+        cerrar
     )
 
 
@@ -3473,248 +7028,438 @@ ventana.title(
 )
 
 ventana.geometry(
-    "820x760"
+    "1280x840"
 )
 
-ventana.resizable(
-    False,
+ventana.minsize(
+    1100,
+    700
+)
+
+ventana.configure(
+    bg="#0B1220"
+)
+
+# ==================================================
+# PANEL PRINCIPAL PROFESIONAL
+# ==================================================
+
+barra_lateral = tk.Frame(
+    ventana,
+    bg="#111C2E",
+    width=235
+)
+
+barra_lateral.pack(
+    side="left",
+    fill="y"
+)
+
+barra_lateral.pack_propagate(
     False
 )
 
-tk.Label(
+contenido_principal = tk.Frame(
     ventana,
-    text="AI BUSINESS ASSISTANT",
-    font=("Arial", 22, "bold")
-).pack(
-    pady=(20, 3)
+    bg="#0B1220"
+)
+
+contenido_principal.pack(
+    side="right",
+    fill="both",
+    expand=True
 )
 
 tk.Label(
-    ventana,
-    text="Panel de administración del negocio",
-    font=("Arial", 12)
+    barra_lateral,
+    text="AI BUSINESS\nASSISTANT",
+    font=("Segoe UI", 18, "bold"),
+    bg="#111C2E",
+    fg="#F4F7FB",
+    justify="left"
 ).pack(
-    pady=(0, 15)
+    anchor="w",
+    padx=20,
+    pady=(28, 8)
 )
 
+etiqueta_management = tk.Label(
+    barra_lateral,
+    text="Executive Management",
+    font=("Segoe UI", 9),
+    bg="#111C2E",
+    fg="#8FA3BF"
+)
+
+etiqueta_management.pack(
+    anchor="w",
+    padx=20,
+    pady=(0, 20)
+)
+
+botones_menu = {}
+
+
+def abrir_desde_menu(comando):
+    comando()
+
+
+def crear_boton_menu(
+    clave,
+    comando
+):
+    boton = tk.Button(
+        barra_lateral,
+        text=t(clave),
+        command=lambda: abrir_desde_menu(
+            comando
+        ),
+        anchor="w",
+        padx=18,
+        font=("Segoe UI", 10, "bold"),
+        bg="#111C2E",
+        fg="#DCE6F5",
+        activebackground="#162238",
+        activeforeground="#FFFFFF",
+        relief="flat",
+        bd=0,
+        cursor="hand2",
+        height=2
+    )
+
+    boton.pack(
+        fill="x",
+        padx=10,
+        pady=3
+    )
+
+    botones_menu[
+        clave
+    ] = boton
+
+
+crear_boton_menu(
+    "dashboard",
+    lambda: abrir_dashboard_profesional(
+        ventana
+    )
+)
+
+crear_boton_menu(
+    "clientes",
+    abrir_clientes
+)
+
+crear_boton_menu(
+    "ventas",
+    abrir_ventas
+)
+
+crear_boton_menu(
+    "inventario",
+    abrir_inventario
+)
+
+crear_boton_menu(
+    "gastos",
+    abrir_gastos
+)
+
+crear_boton_menu(
+    "cuentas_por_cobrar",
+    lambda: abrir_cuentas_por_cobrar(
+        ventana
+    )
+)
+
+crear_boton_menu(
+    "resumen_negocio",
+    abrir_resumen
+)
+
+crear_boton_menu(
+    "diagnostico",
+    abrir_diagnostico
+)
 
 # ==================================================
-# DASHBOARD PRINCIPAL
+# SELECTOR DE IDIOMA
 # ==================================================
 
-marco_dashboard = tk.LabelFrame(
-    ventana,
-    text="Dashboard del negocio",
-    font=("Arial", 12, "bold"),
+separador_idioma = tk.Frame(
+    barra_lateral,
+    bg="#24344D",
+    height=1
+)
+
+separador_idioma.pack(
+    fill="x",
     padx=15,
+    pady=(18, 12)
+)
+
+etiqueta_idioma = tk.Label(
+    barra_lateral,
+    text=t("idioma"),
+    font=("Segoe UI", 9, "bold"),
+    bg="#111C2E",
+    fg="#8FA3BF"
+)
+
+etiqueta_idioma.pack(
+    anchor="w",
+    padx=20,
+    pady=(0, 6)
+)
+
+selector_idioma = ttk.Combobox(
+    barra_lateral,
+    values=[
+        "Español",
+        "English"
+    ],
+    state="readonly",
+    width=20
+)
+
+selector_idioma.pack(
+    padx=18,
+    pady=(0, 12)
+)
+
+if obtener_idioma() == "en":
+    selector_idioma.set(
+        "English"
+    )
+else:
+    selector_idioma.set(
+        "Español"
+    )
+
+tk.Frame(
+    barra_lateral,
+    bg="#24344D",
+    height=1
+).pack(
+    fill="x",
+    padx=15,
+    pady=(6, 12)
+)
+
+boton_salir = tk.Button(
+    barra_lateral,
+    text=t("salir"),
+    command=ventana.destroy,
+    anchor="w",
+    padx=18,
+    font=("Segoe UI", 10, "bold"),
+    bg="#111C2E",
+    fg="#EF4444",
+    activebackground="#162238",
+    activeforeground="#EF4444",
+    relief="flat",
+    bd=0,
+    cursor="hand2",
+    height=2
+)
+
+boton_salir.pack(
+    fill="x",
+    padx=10,
+    pady=3
+)
+
+
+# ==================================================
+# CONTENIDO DE INICIO
+# ==================================================
+
+encabezado = tk.Frame(
+    contenido_principal,
+    bg="#0B1220"
+)
+
+encabezado.pack(
+    fill="x",
+    padx=35,
+    pady=(30, 15)
+)
+
+etiqueta_overview = tk.Label(
+    encabezado,
+    text=t("executive_overview"),
+    font=("Segoe UI", 22, "bold"),
+    bg="#0B1220",
+    fg="#F4F7FB"
+)
+
+etiqueta_overview.pack(
+    anchor="w"
+)
+
+etiqueta_business_overview = tk.Label(
+    encabezado,
+    text=t("business_overview"),
+    font=("Segoe UI", 10),
+    bg="#0B1220",
+    fg="#8FA3BF"
+)
+
+etiqueta_business_overview.pack(
+    anchor="w",
+    pady=(4, 0)
+)
+
+marco_inicio = tk.Frame(
+    contenido_principal,
+    bg="#111C2E",
+    highlightbackground="#24344D",
+    highlightthickness=1
+)
+
+marco_inicio.pack(
+    fill="both",
+    expand=True,
+    padx=35,
+    pady=(0, 35)
+)
+
+etiqueta_dashboard_inicio = tk.Label(
+    marco_inicio,
+    text="Financial Dashboard",
+    font=("Segoe UI", 20, "bold"),
+    bg="#111C2E",
+    fg="#F4F7FB"
+)
+
+etiqueta_dashboard_inicio.pack(
+    pady=(45, 10)
+)
+
+etiqueta_descripcion_dashboard = tk.Label(
+    marco_inicio,
+    text="",
+    font=("Segoe UI", 11),
+    bg="#111C2E",
+    fg="#8FA3BF",
+    wraplength=650,
+    justify="center"
+)
+
+etiqueta_descripcion_dashboard.pack(
+    pady=(0, 25)
+)
+
+boton_dashboard_inicio = tk.Button(
+    marco_inicio,
+    text=t("open_dashboard"),
+    command=lambda: abrir_dashboard_profesional(
+        ventana
+    ),
+    font=("Segoe UI", 11, "bold"),
+    bg="#3B82F6",
+    fg="white",
+    activebackground="#2563EB",
+    activeforeground="white",
+    relief="flat",
+    bd=0,
+    cursor="hand2",
+    padx=30,
     pady=12
 )
 
-marco_dashboard.pack(
-    fill="x",
-    padx=35,
-    pady=(0, 15)
-)
-
-etiquetas_dashboard = {}
+boton_dashboard_inicio.pack()
 
 
-def crear_indicador_dashboard(
-    fila,
-    columna,
-    titulo,
-    clave
-):
-    marco = tk.Frame(
-        marco_dashboard,
-        padx=12,
-        pady=8
+def actualizar_textos_principales():
+    for clave, boton in (
+        botones_menu.items()
+    ):
+        boton.config(
+            text=t(clave)
+        )
+
+    etiqueta_idioma.config(
+        text=t("idioma")
     )
 
-    marco.grid(
-        row=fila,
-        column=columna,
-        padx=8,
-        pady=5,
-        sticky="nsew"
+    boton_salir.config(
+        text=t("salir")
     )
 
-    tk.Label(
-        marco,
-        text=titulo,
-        font=("Arial", 10)
-    ).pack()
-
-    etiqueta = tk.Label(
-        marco,
-        text="$0.00",
-        font=("Arial", 14, "bold")
+    etiqueta_overview.config(
+        text=t(
+            "executive_overview"
+        )
     )
 
-    etiqueta.pack(
-        pady=(3, 0)
+    etiqueta_business_overview.config(
+        text=t(
+            "business_overview"
+        )
     )
 
-    etiquetas_dashboard[
-        clave
-    ] = etiqueta
-
-
-crear_indicador_dashboard(
-    0, 0,
-    "Ventas totales",
-    "ventas_totales"
-)
-
-crear_indicador_dashboard(
-    0, 1,
-    "Ganancia conocida",
-    "ganancia_conocida"
-)
-
-crear_indicador_dashboard(
-    0, 2,
-    "Gastos",
-    "gastos_totales"
-)
-
-crear_indicador_dashboard(
-    1, 0,
-    "Por cobrar",
-    "total_por_cobrar"
-)
-
-crear_indicador_dashboard(
-    1, 1,
-    "Capital en inventario",
-    "capital_inventario"
-)
-
-crear_indicador_dashboard(
-    1, 2,
-    "Flujo de caja",
-    "flujo_caja"
-)
-
-for columna in range(3):
-    marco_dashboard.grid_columnconfigure(
-        columna,
-        weight=1
+    boton_dashboard_inicio.config(
+        text=t(
+            "open_dashboard"
+        )
     )
 
+    if obtener_idioma() == "es":
+        etiqueta_management.config(
+            text="Gestión Ejecutiva"
+        )
 
-def actualizar_dashboard():
-    try:
-        datos = calcular_dashboard()
+        etiqueta_dashboard_inicio.config(
+            text="Dashboard Financiero"
+        )
 
-        for clave, etiqueta in (
-            etiquetas_dashboard.items()
-        ):
-            valor = convertir_numero(
-                datos.get(
-                    clave,
-                    0
-                )
+        etiqueta_descripcion_dashboard.config(
+            text=(
+                "Abrí el Dashboard ejecutivo para ver "
+                "ventas, ganancias, cuentas por cobrar, "
+                "inventario, flujo de caja y alertas."
             )
+        )
 
-            etiqueta.config(
-                text=f"${valor:.2f}"
-            )
+    else:
+        etiqueta_management.config(
+            text="Executive Management"
+        )
 
-    except Exception as error:
-        messagebox.showerror(
-            "Dashboard",
-            (
-                "No se pudo actualizar "
-                "el dashboard.\n\n"
-                f"{error}"
+        etiqueta_dashboard_inicio.config(
+            text="Financial Dashboard"
+        )
+
+        etiqueta_descripcion_dashboard.config(
+            text=(
+                "Open the executive dashboard to review "
+                "sales, profit, accounts receivable, "
+                "inventory, cash flow and alerts."
             )
         )
 
 
-tk.Button(
-    marco_dashboard,
-    text="Actualizar dashboard",
-    width=20,
-    command=actualizar_dashboard
-).grid(
-    row=2,
-    column=0,
-    columnspan=3,
-    pady=(10, 0)
-)
+def seleccionar_idioma(event=None):
+    seleccion = selector_idioma.get()
 
-
-# ==================================================
-# BOTONES PRINCIPALES
-# ==================================================
-
-contenedor = tk.Frame(
-    ventana
-)
-
-contenedor.pack()
-
-botones = [
-    (
-        "Clientes",
-        abrir_clientes
-    ),
-    (
-        "Ventas",
-        abrir_ventas
-    ),
-    (
-        "Inventario",
-        abrir_inventario
-    ),
-    (
-        "Gastos",
-        abrir_gastos
-    ),
-    (
-        "Cuentas por cobrar",
-        lambda: abrir_cuentas_por_cobrar(
-            ventana
+    if seleccion == "English":
+        cambiar_idioma(
+            "en"
         )
-    ),
-    (
-        "Resumen del negocio",
-        abrir_resumen
-    ),
-    (
-        "Diagnóstico inteligente",
-        abrir_diagnostico
-    )
-]
+    else:
+        cambiar_idioma(
+            "es"
+        )
 
-for indice, (
-    texto,
-    comando
-) in enumerate(botones):
+    actualizar_textos_principales()
 
-    tk.Button(
-        contenedor,
-        text=texto,
-        width=20,
-        height=2,
-        command=comando
-    ).grid(
-        row=indice // 2,
-        column=indice % 2,
-        padx=10,
-        pady=7
-    )
 
-tk.Button(
-    ventana,
-    text="Salir",
-    width=15,
-    command=ventana.destroy
-).pack(
-    pady=18
+selector_idioma.bind(
+    "<<ComboboxSelected>>",
+    seleccionar_idioma
 )
 
-actualizar_dashboard()
+actualizar_textos_principales()
 
 ventana.mainloop()
