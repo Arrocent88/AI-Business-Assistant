@@ -14,6 +14,7 @@ from cliente_resumen_ui import abrir_resumen_cliente
 from dashboard import calcular_dashboard
 from dashboard_ui import abrir_dashboard_profesional
 from idiomas import t, cambiar_idioma, obtener_idioma
+from facturacion import generar_recibo_pdf, abrir_archivo
 
 
 # ==================================================
@@ -4315,7 +4316,7 @@ def abrir_historial_ventas():
         total_filtrado = 0
         ganancia_filtrada = 0
 
-        for venta in ventas:
+        for indice_venta, venta in enumerate(ventas):
             cliente = str(
                 venta.get(
                     "cliente",
@@ -4359,10 +4360,10 @@ def abrir_historial_ventas():
                 or busqueda in texto
             ):
                 encontradas.append(
-                    venta
+                    (indice_venta, venta)
                 )
 
-        for numero, venta in enumerate(
+        for numero, (indice_venta, venta) in enumerate(
             encontradas,
             start=1
         ):
@@ -4450,6 +4451,41 @@ def abrir_historial_ventas():
                 font=("Segoe UI", 9),
                 bg=PANEL_SECUNDARIO,
                 fg=TEXTO_SECUNDARIO
+            ).pack(
+                anchor="w",
+                padx=16,
+                pady=(0, 8)
+            )
+
+            def generar_recibo(venta_actual=venta, indice_actual=indice_venta):
+                try:
+                    ruta = generar_recibo_pdf(
+                        venta_actual,
+                        clientes,
+                        indice_actual,
+                        obtener_idioma()
+                    )
+                    abrir_archivo(ruta)
+                except Exception as error:
+                    messagebox.showerror(
+                        "Error al generar recibo" if obtener_idioma() == "es" else "Receipt generation error",
+                        ("No se pudo generar el recibo PDF.\n\n" if obtener_idioma() == "es" else "The PDF receipt could not be generated.\n\n") + str(error)
+                    )
+
+            tk.Button(
+                tarjeta,
+                text="Generar recibo PDF" if obtener_idioma() == "es" else "Generate PDF receipt",
+                command=generar_recibo,
+                font=("Segoe UI", 9, "bold"),
+                bg=AZUL,
+                fg="white",
+                activebackground="#2563EB",
+                activeforeground="white",
+                relief="flat",
+                bd=0,
+                cursor="hand2",
+                padx=14,
+                pady=7
             ).pack(
                 anchor="w",
                 padx=16,
