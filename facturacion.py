@@ -295,6 +295,7 @@ def generar_recibo_pdf(
             Table,
             TableStyle,
             HRFlowable,
+            Image,
         )
     except ImportError as error:
         raise ImportError(
@@ -424,6 +425,7 @@ def generar_recibo_pdf(
     zip_code = _texto_seguro(datos_negocio.get("zip"))
     telefono_empresa = _texto_seguro(datos_negocio.get("telefono"))
     correo_empresa = _texto_seguro(datos_negocio.get("correo"))
+    logo_empresa = _texto_seguro(datos_negocio.get("logo"))
 
     ubicacion = ", ".join(
         parte for parte in [ciudad, estado] if parte
@@ -448,10 +450,33 @@ def generar_recibo_pdf(
 
     empresa_info = "<br/>".join(datos_empresa_lineas)
 
+    encabezado_empresa = Paragraph(nombre_empresa, estilo_empresa)
+
+    if logo_empresa:
+        ruta_logo = Path(logo_empresa)
+        if not ruta_logo.is_absolute():
+            ruta_logo = BASE_DIR / ruta_logo
+        if ruta_logo.exists() and ruta_logo.is_file():
+            try:
+                logo_pdf = Image(str(ruta_logo), width=0.85 * inch, height=0.85 * inch)
+                encabezado_empresa = Table(
+                    [[logo_pdf, Paragraph(nombre_empresa, estilo_empresa)]],
+                    colWidths=[1.0 * inch, 3.25 * inch]
+                )
+                encabezado_empresa.setStyle(TableStyle([
+                    ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+                    ("LEFTPADDING", (0, 0), (-1, -1), 0),
+                    ("RIGHTPADDING", (0, 0), (-1, -1), 6),
+                    ("TOPPADDING", (0, 0), (-1, -1), 0),
+                    ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+                ]))
+            except Exception:
+                encabezado_empresa = Paragraph(nombre_empresa, estilo_empresa)
+
     encabezado = Table(
         [
             [
-                Paragraph(nombre_empresa, estilo_empresa),
+                encabezado_empresa,
                 Paragraph(t["titulo"], estilo_titulo),
             ],
             [
