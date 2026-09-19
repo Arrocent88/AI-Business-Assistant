@@ -15,6 +15,7 @@ from dashboard import calcular_dashboard
 from dashboard_ui import abrir_dashboard_profesional
 from idiomas import t, cambiar_idioma, obtener_idioma
 from facturacion import generar_recibo_pdf, abrir_archivo
+from configuracion_negocio_ui import abrir_configuracion_negocio
 
 
 # ==================================================
@@ -7218,6 +7219,35 @@ crear_boton_menu(
     abrir_diagnostico
 )
 
+boton_configuracion_negocio = tk.Button(
+    barra_lateral,
+    text=(
+        "Business Settings"
+        if obtener_idioma() == "en"
+        else "Configuración del negocio"
+    ),
+    command=lambda: abrir_configuracion_negocio(
+        ventana
+    ),
+    anchor="w",
+    padx=18,
+    font=("Segoe UI", 10, "bold"),
+    bg="#111C2E",
+    fg="#DCE6F5",
+    activebackground="#162238",
+    activeforeground="#FFFFFF",
+    relief="flat",
+    bd=0,
+    cursor="hand2",
+    height=2
+)
+
+boton_configuracion_negocio.pack(
+    fill="x",
+    padx=10,
+    pady=3
+)
+
 # ==================================================
 # SELECTOR DE IDIOMA
 # ==================================================
@@ -7421,6 +7451,14 @@ def actualizar_textos_principales():
 
     boton_salir.config(
         text=t("salir")
+    )
+
+    boton_configuracion_negocio.config(
+        text=(
+            "Business Settings"
+            if obtener_idioma() == "en"
+            else "Configuración del negocio"
+        )
     )
 
     etiqueta_overview.config(
